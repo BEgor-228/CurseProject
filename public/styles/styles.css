@@ -271,6 +271,85 @@ body {
     color: #eab308;
 }
 
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #374151;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+}
+
+.close {
+    color: #facc15;
+    float: right;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #eab308;
+}
+
+.modal-content h2 {
+    color: #facc15;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.modal-content form div {
+    margin-bottom: 15px;
+}
+
+.modal-content label {
+    color: #e2e8f0;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    background-color: #4b5563;
+    color: #e2e8f0;
+}
+
+.modal-content button {
+    width: 100%;
+}
+
+.profile-info {
+    background-color: #374151;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.profile-info p {
+    color: #e2e8f0;
+    margin: 10px 0;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
 /* Responsive Design */
 @media (min-width: 640px) {
     .filters {

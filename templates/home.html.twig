@@ -17,16 +17,21 @@
             <li><a href="/" class="nav-link">Главная</a></li>
             <li><a href="/about" class="nav-link">О театре</a></li>
             <li><a href="/register" class="nav-link">Регистрация</a></li>
-            <li>
-                <div class="dropdown">
-                    <a href="#" class="nav-link">Войти</a>
-                    <div class="dropdown-content">
-                        <a href="#" class="dropdown-link">Войти для пользователя</a>
-                        <a href="#" class="dropdown-link">Войти для Менеджера</a>
-                        <a href="#" class="dropdown-link">Войти для Администратора</a>
+            {% if app.session.get('user') %}
+                <li><a href="{{ path('app_logout') }}" class="nav-link">Выйти</a></li>
+                <li><a href="{{ path('app_profile') }}" class="nav-link">Личный кабинет</a></li>
+            {% else %}
+                <li>
+                    <div class="dropdown">
+                        <a href="{{ path('app_login') }}" class="nav-link">Войти</a>
+                        <div class="dropdown-content">
+                            <a href="{{ path('app_login') }}?role=viewer" class="dropdown-link">Войти для пользователя</a>
+                            <a href="{{ path('app_login') }}?role=manager" class="dropdown-link">Войти для Менеджера</a>
+                            <a href="{{ path('app_login') }}?role=admin" class="dropdown-link">Войти для Администратора</a>
+                        </div>
                     </div>
-                </div>
-            </li>
+                </li>
+            {% endif %}
         </ul>
     </nav>
 

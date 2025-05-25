@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialTheater - Личный кабинет</title>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}">
+</head>
+<body>
+    <nav class="nav-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 class="nav-logo">SocialTheater</h2>
+            <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        </div>
+        <ul class="nav-list">
+            <li><a href="{{ path('app_home') }}" class="nav-link">Главная</a></li>
+            <li><a href="{{ path('app_about') }}" class="nav-link">О театре</a></li>
+            <li><a href="{{ path('app_logout') }}" class="nav-link">Выйти</a></li>
+        </ul>
+    </nav>
+
+    <div class="content-wrapper" id="content-wrapper">
+        <div class="mobile-nav">
+            <a href="{{ path('app_home') }}" class="mobile-nav-link">Главная</a>
+            <a href="{{ path('app_about') }}" class="mobile-nav-link">О театре</a>
+            <a href="{{ path('app_logout') }}" class="mobile-nav-link">Выйти</a>
+        </div>
+
+        <div class="main-content">
+            <h1>Личный кабинет</h1>
+            <div class="profile-info">
+                <p><strong>ФИО:</strong> {{ user.fullname }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Роль:</strong> {{ user.role == 'viewer' ? 'Пользователь' : user.role == 'manager' ? 'Менеджер' : 'Администратор' }}</p>
+            </div>
+            <div class="profile-actions">
+                <a href="{{ path('app_home') }}" class="filter-button">Вернуться</a>
+                <a href="{{ path('app_logout') }}" class="filter-button">Выйти</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Контакты: телефон администратора: 89046862432</p>
+            <p>Почта администратора: egorbezrukavnikov@gmail.com</p>
+            <p>vk: <a href="https://vk.com/id488943174">https://vk.com/id488943174</a></p>
+        </div>
+    </div>
+
+    <script src="{{ asset('scripts/sidebar.js') }}"></script>
+</body>
+</html>

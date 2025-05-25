@@ -1,0 +1,29 @@
+{# filepath: templates/login.html.twig #}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}">
+</head>
+<body>
+    <div class="main-content">
+        <h2>Вход</h2>
+        {% if error %}
+            <div style="color: red">{{ error }}</div>
+        {% endif %}
+        <form method="post">
+            <label>Роль:
+                <select name="role" required>
+                    <option value="viewer">Пользователь</option>
+                    <option value="manager">Менеджер</option>
+                    <option value="admin">Администратор</option>
+                </select>
+            </label><br>
+            <label>Почта: <input type="email" name="mail" required></label><br>
+            <label>Пароль: <input type="password" name="password" required></label><br>
+            <button type="submit">Войти</button>
+        </form>
+    </div>
+</body>
+</html>
