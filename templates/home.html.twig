@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialTheater - Главная</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="nav-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 class="nav-logo">SocialTheater</h2>
+            <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        </div>
+        <ul class="nav-list">
+            <li><a href="/" class="nav-link">Главная</a></li>
+            <li><a href="/about" class="nav-link">О театре</a></li>
+            <li><a href="/register" class="nav-link">Регистрация</a></li>
+            <li>
+                <div class="dropdown">
+                    <a href="#" class="nav-link">Войти</a>
+                    <div class="dropdown-content">
+                        <a href="#" class="dropdown-link">Войти для пользователя</a>
+                        <a href="#" class="dropdown-link">Войти для Менеджера</a>
+                        <a href="#" class="dropdown-link">Войти для Администратора</a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper" id="content-wrapper">
+        <!-- Mobile Navigation -->
+        <div class="mobile-nav">
+            <a href="/" class="mobile-nav-link">Главная</a>
+            <a href="/about" class="mobile-nav-link">О театре</a>
+            <a href="/repertoire" class="mobile-nav-link">Репертуар</a>
+            <a href="/tickets" class="mobile-nav-link">Купить билеты</a>
+            <li><a href="{{ path('register_select') }}" class="nav-link">Регистрация</a></li>
+            <a href="#" class="mobile-nav-link">Войти</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1>Добро пожаловать в SocialTheater!</h1>
+
+            <!-- Filters -->
+            <div class="filters">
+                <form id="filter-form" method="get" action="{{ path('app_home') }}">
+                    <select name="repertoire" class="filter-select">
+                        <option value="">Все репертуары</option>
+                        {% for repertoire in repertoires %}
+                            <option value="{{ repertoire.repertoireId }}" {% if selectedRepertoireId == repertoire.repertoireId %}selected{% endif %}>
+                                {{ repertoire.repertoireTitle }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <select name="genre" class="filter-select">
+                        <option value="">Все жанры</option>
+                        <option value="Драма" {% if selectedGenre == 'Драма' %}selected{% endif %}>Драма</option>
+                        <option value="Комедия" {% if selectedGenre == 'Комедия' %}selected{% endif %}>Комедия</option>
+                        <option value="Трагедия" {% if selectedGenre == 'Трагедия' %}selected{% endif %}>Трагедия</option>
+                    </select>
+                    <input type="date" name="date" class="filter-input" value="{{ selectedDate }}">
+                    <button type="submit" class="filter-button">Фильтровать</button>
+                </form>
+            </div>
+
+            <!-- Performances List -->
+            <div class="performances-grid">
+                {% for performance in performances %}
+                    <div class="performance-card">
+                        <h3>{{ performance.performanceTitle }}</h3>
+                        <p>Жанр: {{ performance.performanceGenre }}</p>
+                        <p>Дата: {{ performance.performanceData|date('Y-m-d') }}</p>
+                        <p>Продолжительность: {{ performance.performanceDuration|date('H:i') }}</p>
+                        <p>Актёры: {{ performance.performanceCastList }}</p>
+                        <p>Описание: {{ performance.performanceDescription|slice(0, 100) ~ '...' }}</p>
+                        <p>Цена: {{ performance.performancePrice }} руб.</p>
+                        <a href="/tickets?performance={{ performance.performanceId }}" class="buy-button">Купить билет</a>
+                    </div>
+                {% else %}
+                    <p class="no-performances">Нет доступных спектаклей для выбранного репертуара.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Interactive Hall Scheme (Placeholder) -->
+            <div class="hall-section">
+                <h2>Выберите места</h2>
+                <div class="hall-placeholder">
+                    <p>Интерактивная схема зала появится после выбора спектакля.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Контакты: телефон администратора: 89046862432</p>
+            <p>Почта администратора: egorbezrukavnikov@gmail.com</p>
+            <p>vk: <a href="https://vk.com/id488943174">https://vk.com/id488943174</a></p>
+        </div>
+    </div>
+
+    <script src="scripts/sidebar.js"></script>
+</body>
+</html>

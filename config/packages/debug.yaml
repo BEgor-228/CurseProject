@@ -1,5 +1,26 @@
-when@dev:
-    debug:
-        # Forwards VarDumper Data clones to a centralized server allowing to inspect dumps on CLI or in your browser.
-        # See the "server:dump" command to start a new server.
-        dump_destination: "tcp://%env(VAR_DUMPER_SERVER)%"
+# when@dev:
+#     debug:
+#         # Forwards VarDumper Data clones to a centralized server allowing to inspect dumps on CLI or in your browser.
+#         # See the "server:dump" command to start a new server.
+#         dump_destination: "tcp://%env(VAR_DUMPER_SERVER)%"
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+        driver: 'pdo_pgsql'
+        server_version: '17'
+        charset: utf8
+        default_table_options:
+            charset: utf8
+            collate: utf8_general_ci
+
+    orm:
+        auto_generate_proxy_classes: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+        mappings:
+            App:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App

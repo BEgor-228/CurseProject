@@ -1,0 +1,20 @@
+{# templates/register_form.html.twig #}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация {{ roleName }}</title>
+</head>
+<body>
+    <h2>Регистрация {{ roleName }}</h2>
+    {% if error %}
+        <div style="color: red">{{ error }}</div>
+    {% endif %}
+    <form method="post">
+        <label>ФИО: <input type="text" name="fullname" value="{{ fullname|default('') }}" required></label><br>
+        <label>Почта: <input type="email" name="mail" value="{{ mail|default('') }}" required></label><br>
+        <label>Пароль: <input type="password" name="password" required></label><br>
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+</body>
+</html>

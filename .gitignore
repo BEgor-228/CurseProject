@@ -1,25 +1,42 @@
-
-###> symfony/framework-bundle ###
+# Symfony environment files
 /.env.local
 /.env.local.php
 /.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
+
+# Symfony cache, logs, sessions
 /var/
+/var/*
+!/var/.gitkeep
+
+# Vendor (composer dependencies)
 /vendor/
-###< symfony/framework-bundle ###
 
-###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
-###< phpunit/phpunit ###
-
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-/phpunit.xml
-###< symfony/phpunit-bridge ###
-
-###> symfony/asset-mapper ###
+# Public bundles (assets from vendors)
+/public/bundles/
 /public/assets/
 /assets/vendor/
-###< symfony/asset-mapper ###
+
+# PHPUnit
+/phpunit.xml
+.phpunit.result.cache
+
+# Symfony secrets
+/config/secrets/prod/prod.decrypt.private.php
+
+# IDE files
+/.idea/
+/*.iml
+/.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node/npm (if using Encore or npm)
+/node_modules/
+/yarn.lock
+/package-lock.json
+
+# Build artifacts
+/build/
+dist/
