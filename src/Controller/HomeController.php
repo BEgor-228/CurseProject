@@ -183,11 +183,16 @@ class HomeController extends AbstractController{
             }
         }
 
+        $places = [];
+        if ($hall) {
+            $places = $placeRepository->findBy(['hall' => $hall]);
+        }
         return $this->render('sellticket.html.twig', [
             'performance' => $performance,
             'hallNumber' => $hallNumber,
             'placesCount' => $placesCount,
             'takenPlaces' => $takenPlaces,
+            'places' => $places,
         ]);
     }
 }

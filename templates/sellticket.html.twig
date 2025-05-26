@@ -21,18 +21,47 @@
         <div class="hall-scheme" style="margin-top: 30px;">
             <h3>Схема зала</h3>
             <div style="display: flex; flex-wrap: wrap; max-width: 400px;">
+                {% set priceMap = {'Партер': 300, 'Амфитеатр': 500, 'Ложа': 400} %}
                 {% for i in 1..placesCount %}
+                    {% set place = (places|filter(p => p.placeNumber == i)|first) %}
                     {% set isTaken = i in takenPlaces %}
-                    <div style="
-                        width: 32px; height: 32px; margin: 4px; display: flex; align-items: center; justify-content: center;
-                        border: 1px solid #888;
-                        background: {{ isTaken ? '#e11d48' : '#facc15' }};
-                        color: #222;
-                        border-radius: 4px;
-                        font-weight: bold;
-                    ">
+                    {% set status = place ? place.placeStatus : 'Неизвестно' %}
+                    {% set level = place ? place.placeLevel : 'Неизвестно' %}
+                    {% set levelName = level == 1 ? 'Партер' : (level == 2 ? 'Амфитеатр' : (level == 3 ? 'Ложа' : 'Неизвестно')) %}
+                    {% set price = priceMap[levelName]|default('—') %}
+                    <button type="button"
+                        class="place-btn"
+                        style="
+                            width: 32px; height: 32px; margin: 4px; display: flex; align-items: center; justify-content: center;
+                            border: 1px solid #888;
+                            background: {{ isTaken ? '#e11d48' : '#facc15' }};
+                            color: #222;
+                            border-radius: 4px;
+                            font-weight: bold;
+                            position: relative;
+                            cursor: pointer;
+                        "
+                        data-status="{{ status }}"
+                        data-level="{{ levelName }}"
+                        data-price="{{ price }}"
+                    >
                         {{ i }}
-                    </div>
+                        <span class="place-tooltip" style="
+                            display:none;
+                            position: absolute;
+                            bottom: 110%;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: #374151;
+                            color: #fff;
+                            padding: 6px 12px;
+                            border-radius: 6px;
+                            font-size: 0.95rem;
+                            white-space: nowrap;
+                            z-index: 10;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                        "></span>
+                    </button>
                 {% endfor %}
             </div>
             <div style="margin-top: 10px;">
@@ -41,5 +70,6 @@
             </div>
         </div>
     </div>
+    <script src="{{ asset('script/sidebar.js') }}"></script></body>
 </body>
 </html>

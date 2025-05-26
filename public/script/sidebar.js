@@ -49,4 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+
+    //Добавил 22:07 26.05
+    document.querySelectorAll('.place-btn').forEach(btn => {
+        const tooltip = btn.querySelector('.place-tooltip');
+        btn.addEventListener('mouseenter', () => {
+            tooltip.textContent = `Статус: ${btn.dataset.status}, Зона: ${btn.dataset.level}, Цена: ${btn.dataset.price} руб.`;
+            tooltip.style.display = 'block';
+        });
+        btn.addEventListener('mouseleave', () => {
+            tooltip.style.display = 'none';
+        });
+    });
 });
