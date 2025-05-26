@@ -41,8 +41,8 @@
         <div class="mobile-nav">
             <a href="/" class="mobile-nav-link">Главная</a>
             <a href="/about" class="mobile-nav-link">О театре</a>
-            <a href="/repertoire" class="mobile-nav-link">Репертуар</a>
-            <a href="/tickets" class="mobile-nav-link">Купить билеты</a>
+            {# <a href="/repertoire" class="mobile-nav-link">Репертуар</a> #}
+            {# <a href="/tickets" class="mobile-nav-link">Купить билеты</a> #}
             <li><a href="{{ path('register_select') }}" class="nav-link">Регистрация</a></li>
             <a href="#" class="mobile-nav-link">Войти</a>
         </div>
@@ -84,7 +84,11 @@
                         <p>Актёры: {{ performance.performanceCastList }}</p>
                         <p>Описание: {{ performance.performanceDescription|slice(0, 100) ~ '...' }}</p>
                         <p>Цена: {{ performance.performancePrice }} руб.</p>
-                        <a href="/tickets?performance={{ performance.performanceId }}" class="buy-button">Купить билет</a>
+                        {% if app.session.get('user') %}
+                            <a href="/tickets?performance={{ performance.performanceId }}" class="buy-button">Купить билет</a>
+                        {% else %}
+                            <button type="button" class="buy-button show-login-popup">Купить билет</button>
+                        {% endif %}
                     </div>
                 {% else %}
                     <p class="no-performances">Нет доступных спектаклей для выбранного репертуара.</p>
@@ -107,7 +111,9 @@
             <p>vk: <a href="https://vk.com/id488943174">https://vk.com/id488943174</a></p>
         </div>
     </div>
-
-    <script src="scripts/sidebar.js"></script>
-</body>
+    
+    <div id="login-required-popup" style="display:none;position:fixed;top:30%;left:50%;transform:translate(-50%, -50%);background:#374151;color:#fff;padding:20px 30px;border-radius:8px;z-index:2000;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:1.1rem;">
+        Для покупки билета необходимо войти в аккаунт.
+    </div>
+    <script src="{{ asset('script/sidebar.js') }}"></script></body>
 </html>

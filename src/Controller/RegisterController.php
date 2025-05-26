@@ -26,14 +26,12 @@ class RegisterController extends AbstractController{
     }
 
     #[Route('/register/manager', name: 'register_manager')]
-    public function registerManager(Request $request, EntityManagerInterface $em, ManagerRepository $managerRepo, AdministratorRepository $adminRepo): Response
-    {
+    public function registerManager(Request $request, EntityManagerInterface $em, ManagerRepository $managerRepo, AdministratorRepository $adminRepo): Response{
         return $this->handleRegistration($request, $em, $managerRepo, 'manager', 'Менеджер', $adminRepo);
     }
 
     #[Route('/register/admin', name: 'register_admin')]
-    public function registerAdmin(Request $request, EntityManagerInterface $em, AdministratorRepository $adminRepo): Response
-    {
+    public function registerAdmin(Request $request, EntityManagerInterface $em, AdministratorRepository $adminRepo): Response{
         return $this->handleRegistration($request, $em, $adminRepo, 'admin', 'Администратор');
     }
 
@@ -99,7 +97,6 @@ class RegisterController extends AbstractController{
                             $randomAdmin = $admins[array_rand($admins)];
                             $entity->setAdministrator($randomAdmin);
                         } else {
-                            // Создать администратора по умолчанию
                             $defaultAdmin = (new Administrator())
                                 ->setAdministratorFullname('Администратор по умолчанию')
                                 ->setAdministratorMail('admin@socialtheater.com')
@@ -109,7 +106,6 @@ class RegisterController extends AbstractController{
                             $entity->setAdministrator($defaultAdmin);
                         }
                     }
-
                     $em->persist($entity);
                     $em->flush();
                     $this->addFlash('success', 'Регистрация прошла успешно.');

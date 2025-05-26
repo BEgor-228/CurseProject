@@ -6,8 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: "Manager")]
-class Manager
-{
+class Manager{
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
     #[ORM\Column(name: "Manager_ID", type: "integer")]
@@ -26,51 +25,42 @@ class Manager
     #[ORM\JoinColumn(name: "Administrator_ID", referencedColumnName: "Administrator_ID", nullable: false)]
     private ?Administrator $administrator = null;
 
-    public function getManagerId(): ?int
-    {
+    public function getManagerId(): ?int{
         return $this->managerId;
     }
 
-    public function getManagerPassword(): ?string
-    {
+    public function getManagerPassword(): ?string{
         return $this->managerPassword;
     }
 
-    public function setManagerPassword(?string $managerPassword): self
-    {
+    public function setManagerPassword(?string $managerPassword): self{
         $this->managerPassword = $managerPassword;
         return $this;
     }
 
-    public function getManagerMail(): ?string
-    {
+    public function getManagerMail(): ?string{
         return $this->managerMail;
     }
 
-    public function setManagerMail(?string $managerMail): self
-    {
+    public function setManagerMail(?string $managerMail): self{
         $this->managerMail = $managerMail;
         return $this;
     }
 
-    public function getManagerFullname(): ?string
-    {
+    public function getManagerFullname(): ?string{
         return $this->managerFullname;
     }
 
-    public function setManagerFullname(?string $managerFullname): self
-    {
+    public function setManagerFullname(?string $managerFullname): self {
         $this->managerFullname = $managerFullname;
         return $this;
     }
 
-    public function getAdministrator(): ?Administrator
-    {
+    public function getAdministrator(): ?Administrator{
         return $this->administrator;
     }
 
-    public function setAdministrator(?Administrator $administrator): self
-    {
+    public function setAdministrator(?Administrator $administrator): self{
         $this->administrator = $administrator;
         return $this;
     }

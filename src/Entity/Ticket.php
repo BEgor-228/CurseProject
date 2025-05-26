@@ -6,8 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: "Ticket")]
-class Ticket
-{
+class Ticket{
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
     #[ORM\Column(name: "Ticket_ID", type: "integer")]
@@ -35,73 +34,60 @@ class Ticket
     #[ORM\JoinColumn(name: "Performance_ID", referencedColumnName: "Performance_ID", nullable: false)]
     private ?Performance $performance = null;
 
-    public function getTicketId(): ?int
-    {
+    public function getTicketId(): ?int{
         return $this->ticketId;
     }
 
-    public function getTicketPurchaseDate(): ?\DateTimeInterface
-    {
+    public function getTicketPurchaseDate(): ?\DateTimeInterface{
         return $this->ticketPurchaseDate;
     }
 
-    public function setTicketPurchaseDate(?\DateTimeInterface $ticketPurchaseDate): self
-    {
+    public function setTicketPurchaseDate(?\DateTimeInterface $ticketPurchaseDate): self{
         $this->ticketPurchaseDate = $ticketPurchaseDate;
         return $this;
     }
 
-    public function getTicketHallNumber(): ?int
-    {
+    public function getTicketHallNumber(): ?int{
         return $this->ticketHallNumber;
     }
 
-    public function setTicketHallNumber(?int $ticketHallNumber): self
-    {
+    public function setTicketHallNumber(?int $ticketHallNumber): self{
         $this->ticketHallNumber = $ticketHallNumber;
         return $this;
     }
 
-    public function getViewer(): ?Viewer
-    {
+    public function getViewer(): ?Viewer {
         return $this->viewer;
     }
 
-    public function setViewer(?Viewer $viewer): self
-    {
+    public function setViewer(?Viewer $viewer): self{
         $this->viewer = $viewer;
         return $this;
     }
 
-    public function getHall(): ?Hall
-    {
+    public function getHall(): ?Hall{
         return $this->hall;
     }
 
-    public function setHall(?Hall $hall): self
-    {
+    public function setHall(?Hall $hall): self{
         $this->hall = $hall;
         return $this;
     }
 
-    public function getPlace(): ?Place
-    {
+    public function getPlace(): ?Place{
         return $this->place;
     }
 
-    public function setPlace(?Place $place): self
-    {
+    public function setPlace(?Place $place): self{
         $this->place = $place;
         return $this;
     }
 
-    public function getPerformance(): ?Performance
-    {
+    public function getPerformance(): ?Performance{
         return $this->performance;
     }
 
-    public function setPerformance(?Performance $performance): self
-    {
+    public function setPerformance(?Performance $performance): self{
         $this->performance = $performance;
         return $this;
     }

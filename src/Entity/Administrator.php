@@ -6,8 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: "Administrator")]
-class Administrator
-{
+class Administrator{
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
     #[ORM\Column(name: "Administrator_ID", type: "integer")]
@@ -22,40 +21,33 @@ class Administrator
     #[ORM\Column(name: "Administrator_fullname", type: "string", length: 40)]
     private ?string $administratorFullname = null;
 
-    public function getAdministratorId(): ?int
-    {
+    public function getAdministratorId(): ?int{
         return $this->administratorId;
     }
 
-    public function getAdministratorPassword(): ?string
-    {
+    public function getAdministratorPassword(): ?string{
         return $this->administratorPassword;
     }
 
-    public function setAdministratorPassword(?string $administratorPassword): self
-    {
+    public function setAdministratorPassword(?string $administratorPassword): self{
         $this->administratorPassword = $administratorPassword;
         return $this;
     }
 
-    public function getAdministratorMail(): ?string
-    {
+    public function getAdministratorMail(): ?string{
         return $this->administratorMail;
     }
 
-    public function setAdministratorMail(?string $administratorMail): self
-    {
+    public function setAdministratorMail(?string $administratorMail): self{
         $this->administratorMail = $administratorMail;
         return $this;
     }
 
-    public function getAdministratorFullname(): ?string
-    {
+    public function getAdministratorFullname(): ?string{
         return $this->administratorFullname;
     }
 
-    public function setAdministratorFullname(?string $administratorFullname): self
-    {
+    public function setAdministratorFullname(?string $administratorFullname): self{
         $this->administratorFullname = $administratorFullname;
         return $this;
     }
