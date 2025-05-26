@@ -12,23 +12,11 @@ class Hall{
     #[ORM\Column(name: "Hall_ID", type: "integer")]
     private ?int $hallId = null;
 
-    #[ORM\Column(name: "Hall_size", type: "string", length: 15, nullable: true)]
-    private ?string $hallSize = null;
-
     #[ORM\Column(name: "Hall_capacity", type: "integer")]
     private ?int $hallCapacity = null;
 
     public function getHallId(): ?int{
         return $this->hallId;
-    }
-
-    public function getHallSize(): ?string{
-        return $this->hallSize;
-    }
-
-    public function setHallSize(?string $hallSize): self{
-        $this->hallSize = $hallSize;
-        return $this;
     }
 
     public function getHallCapacity(): ?int{

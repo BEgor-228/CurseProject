@@ -6,6 +6,8 @@ use App\Repository\TakePerformanceRepository;
 use App\Repository\ViewerRepository;
 use App\Repository\ManagerRepository;
 use App\Repository\AdministratorRepository;
+use App\Repository\TicketRepository;
+use App\Repository\PlaceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -140,5 +142,52 @@ class HomeController extends AbstractController{
         $session->clear();
         $this->addFlash('success', 'Вы успешно вышли.');
         return $this->redirectToRoute('app_home');
+    }
+
+
+    #[Route('/ticketsell', name: 'app_ticketsell')]
+    public function ticketSell(
+        Request $request,
+        SessionInterface $session,
+        TakePerformanceRepository $performanceRepository,
+        TicketRepository $ticketRepository,
+        PlaceRepository $placeRepository
+    ): Response {
+        if (!$session->get('user')) {
+            $this->addFlash('error', 'Необходимо войти в аккаунт.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        $performanceId = $request->query->get('performance');
+        if (!$performanceId) {
+            $this->addFlash('error', 'Не выбран спектакль.');
+            return $this->redirectToRoute('app_home');
+        }
+
+        $performance = $performanceRepository->find($performanceId);
+        if (!$performance) {
+            $this->addFlash('error', 'Спектакль не найден.');
+            return $this->redirectToRoute('app_home');
+        }
+
+        $hall = $performance->getHall();
+        $hallNumber = $hall ? $hall->getHallId() : '—';
+        $placesCount = $hall ? $hall->getHallCapacity() : 0;
+
+        $tickets = $ticketRepository->findBy(['performance' => $performance]);
+        $takenPlaces = [];
+        foreach ($tickets as $ticket) {
+            $place = $ticket->getPlace();
+            if ($place) {
+                $takenPlaces[] = $place->getPlaceNumber();
+            }
+        }
+
+        return $this->render('sellticket.html.twig', [
+            'performance' => $performance,
+            'hallNumber' => $hallNumber,
+            'placesCount' => $placesCount,
+            'takenPlaces' => $takenPlaces,
+        ]);
     }
 }

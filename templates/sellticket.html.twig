@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Покупка билета</title>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}">
+</head>
+<body>
+    <div class="main-content" style="display: flex; gap: 32px;">
+        <div>
+            <div><strong>Зал:</strong> {{ hallNumber }}</div>
+            <div style="margin-top: 10px;"><strong>Мест:</strong> {{ placesCount }}</div>
+        </div>
+        <div style="background: #374151; border-radius: 8px; padding: 16px; min-width: 220px;">
+            <div style="font-weight: bold; color: #facc15;">{{ performance.performanceTitle }}</div>
+            <div>Жанр: {{ performance.performanceGenre }}</div>
+            <div>Длительность: {{ performance.performanceDuration|date('H:i') }}</div>
+            <div>Цена: {{ performance.performancePrice }} руб.</div>
+        </div>
+        <a href="/">Вернуться на главную</a>
+        <div class="hall-scheme" style="margin-top: 30px;">
+            <h3>Схема зала</h3>
+            <div style="display: flex; flex-wrap: wrap; max-width: 400px;">
+                {% for i in 1..placesCount %}
+                    {% set isTaken = i in takenPlaces %}
+                    <div style="
+                        width: 32px; height: 32px; margin: 4px; display: flex; align-items: center; justify-content: center;
+                        border: 1px solid #888;
+                        background: {{ isTaken ? '#e11d48' : '#facc15' }};
+                        color: #222;
+                        border-radius: 4px;
+                        font-weight: bold;
+                    ">
+                        {{ i }}
+                    </div>
+                {% endfor %}
+            </div>
+            <div style="margin-top: 10px;">
+                <span style="display:inline-block;width:20px;height:20px;background:#e11d48;border-radius:3px;margin-right:5px;vertical-align:middle;"></span> Занято
+                <span style="display:inline-block;width:20px;height:20px;background:#facc15;border-radius:3px;margin-left:15px;margin-right:5px;vertical-align:middle;"></span> Свободно
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -85,7 +85,7 @@
                         <p>Описание: {{ performance.performanceDescription|slice(0, 100) ~ '...' }}</p>
                         <p>Цена: {{ performance.performancePrice }} руб.</p>
                         {% if app.session.get('user') %}
-                            <a href="/tickets?performance={{ performance.performanceId }}" class="buy-button">Купить билет</a>
+                            <a href="{{ path('app_ticketsell', {performance: performance.performanceId}) }}" class="buy-button">Купить билет</a>
                         {% else %}
                             <button type="button" class="buy-button show-login-popup">Купить билет</button>
                         {% endif %}
