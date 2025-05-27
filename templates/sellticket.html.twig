@@ -4,69 +4,155 @@
     <meta charset="UTF-8">
     <title>Покупка билета</title>
     <link rel="stylesheet" href="{{ asset('styles/styles.css') }}">
+    <style>
+        .hall-info { margin-bottom: 20px; }
+        .performance-info { margin-bottom: 20px; }
+        .hall-map { display: flex; flex-wrap: wrap; gap: 10px; max-width: 600px; }
+        .place-wrapper { display: inline-block; }
+        .place-btn {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+            position: relative;
+            cursor: pointer;
+        }
+        .place-btn.free { background-color: green; }
+        .place-btn.taken { background-color: red; cursor: not-allowed; }
+        .place-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .place-btn:hover .place-tooltip { display: block; }
+        .legend { margin-top: 10px; }
+        .taken-legend { color: red; margin-right: 20px; }
+        .free-legend { color: green; }
+        .ticket-details {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            max-width: 600px;
+        }
+        .ticket-details h3 { margin-top: 0; }
+        .ticket-details p { margin: 5px 0; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        h2, h3 { margin-bottom: 10px; }
+    </style>
 </head>
 <body>
     <div class="main-content" style="display: flex; gap: 32px;">
-        <div>
-            <div><strong>Зал:</strong> {{ hallNumber }}</div>
-            <div style="margin-top: 10px;"><strong>Мест:</strong> {{ placesCount }}</div>
+        <div class="hall-info">
+            <p><strong>Зал:</strong> {{ hallNumber }}</p>
+            <p><strong>Мест:</strong> {{ placesCount }}</p>
         </div>
-        <div style="background: #374151; border-radius: 8px; padding: 16px; min-width: 220px;">
-            <div style="font-weight: bold; color: #facc15;">{{ performance.performanceTitle }}</div>
-            <div>Жанр: {{ performance.performanceGenre }}</div>
-            <div>Длительность: {{ performance.performanceDuration|date('H:i') }}</div>
-            <div>Цена: {{ performance.performancePrice }} руб.</div>
+
+        <div class="performance-info">
+            <h2>{{ performance.performanceTitle }}</h2>
+            <p><strong>Жанр:</strong> {{ performance.performanceGenre }}</p>
+            <p><strong>Длительность:</strong> {{ performance.performanceDuration|date('H:i') }}</p>
+            <p><strong>Цена:</strong> {{ performance.performancePrice }} руб.</p>
         </div>
-        <a href="/">Вернуться на главную</a>
-        <div class="hall-scheme" style="margin-top: 30px;">
-            <h3>Схема зала</h3>
-            <div style="display: flex; flex-wrap: wrap; max-width: 400px;">
-                {% set priceMap = {'Партер': 300, 'Амфитеатр': 500, 'Ложа': 400} %}
-                {% for i in 1..placesCount %}
-                    {% set place = (places|filter(p => p.placeNumber == i)|first) %}
-                    {% set isTaken = i in takenPlaces %}
-                    {% set status = place ? place.placeStatus : 'Неизвестно' %}
-                    {% set level = place ? place.placeLevel : 'Неизвестно' %}
-                    {% set levelName = level == 1 ? 'Партер' : (level == 2 ? 'Амфитеатр' : (level == 3 ? 'Ложа' : 'Неизвестно')) %}
-                    {% set price = priceMap[levelName]|default('—') %}
-                    <button type="button"
-                        class="place-btn"
-                        style="width: 32px; height: 32px; margin: 4px; display: flex; align-items: center; justify-content: center;
-                            border: 1px solid #888;
-                            background: {{ isTaken ? '#e11d48' : '#facc15' }};
-                            color: #222;
-                            border-radius: 4px;
-                            font-weight: bold;
-                            position: relative;
-                            cursor: pointer;"
-                        data-status="{{ status }}"
-                        data-level="{{ levelName }}"
-                        data-price="{{ price }}"
-                        data-place="{{ i }}"
-                        data-taken="{{ isTaken ? '1' : '0' }}"
-                    >
+
+        <a href="{{ path('app_home') }}">Вернуться на главную</a>
+
+        <h3>Схема зала</h3>
+        <div class="hall-map">
+            {% set priceMap = {'Партер': 300, 'Амфитеатр': 500, 'Ложа': 400} %}
+            {% for i in 1..placesCount %}
+                {% set place = (places|filter(p => p.placeNumber == i)|first) %}
+                {% set isTaken = i in takenPlaces %}
+                {% set status = place ? place.placeStatus : 'Неизвестно' %}
+                {% set level = place ? place.placeLevel : 'Неизвестно' %}
+                {% set levelName = level == 1 ? 'Партер' : (level == 2 ? 'Амфитеатр' : (level == 3 ? 'Ложа' : 'Неизвестно')) %}
+                {% set price = priceMap[levelName]|default('—') %}
+                <div class="place-wrapper">
+                    <a href="{{ path('app_ticketsell', {'performance': performance.performanceId, 'placeNumber': i}) }}"
+                    class="place-btn {{ isTaken ? 'taken' : 'free' }}"
+                    data-place="{{ i }}"
+                    data-status="{{ status }}"
+                    data-level="{{ levelName }}"
+                    data-price="{{ price }}"
+                    data-taken="{{ isTaken ? '1' : '0' }}">
                         {{ i }}
-                        <span class="place-tooltip" style="display:none;position: absolute;bottom: 110%;left: 50%;transform: translateX(-50%);background: #374151;color: #fff;padding: 6px 12px;border-radius: 6px;font-size: 0.95rem;white-space: nowrap;z-index: 10;box-shadow: 0 2px 8px rgba(0,0,0,0.2);"></span>
-                    </button>
-                {% endfor %}
-            </div>
-            <div style="margin-top: 10px;">
-                <span style="display:inline-block;width:20px;height:20px;background:#e11d48;border-radius:3px;margin-right:5px;vertical-align:middle;"></span> Занято
-                <span style="display:inline-block;width:20px;height:20px;background:#facc15;border-radius:3px;margin-left:15px;margin-right:5px;vertical-align:middle;"></span> Свободно
+                        <span class="place-tooltip"></span>
+                    </a>
+                </div>
+            {% endfor %}
+            <div class="legend">
+                <span class="taken-legend">Занято</span>
+                <span class="free-legend">Свободно</span>
             </div>
         </div>
-    </div>
-    <div id="buy-modal" style="display:none;position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:#374151;color:#fff;padding:24px 32px;border-radius:12px;z-index:3000;box-shadow:0 4px 16px rgba(0,0,0,0.25);min-width:320px;">
-        <div id="buy-modal-content"></div>
-        <button id="buy-modal-close" style="margin-top:16px;background:#e11d48;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;">Закрыть</button>
-    </div>
-    <div id="hall-data"
-        data-title="{{ performance.performanceTitle|e('html_attr') }}"
-        data-genre="{{ performance.performanceGenre|e('html_attr') }}"
-        data-duration="{{ performance.performanceDuration|date('H:i')|e('html_attr') }}"
-        data-hall="{{ hallNumber|e('html_attr') }}"
-        data-price="{{ performance.performancePrice|e('html_attr') }}">
-    </div>
+
+        {% if ticketDetails %}
+            <div class="ticket-details">
+                <h3>Детали билета</h3>
+                <p><strong>Название спектакля:</strong> {{ ticketDetails.title }}</p>
+                <p><strong>Жанр:</strong> {{ ticketDetails.genre }}</p>
+                <p><strong>Длительность:</strong> {{ ticketDetails.duration|date('H:i') }}</p>
+                <p><strong>Зал №:</strong> {{ ticketDetails.hallNumber }}</p>
+                <p><strong>Место №:</strong> {{ ticketDetails.placeNumber }} ({{ ticketDetails.placeStatus }})</p>
+                <p><strong>Цена спектакля:</strong> {{ ticketDetails.perfPrice }} руб.</p>
+                <p><strong>Цена места:</strong> {{ ticketDetails.placePrice }} руб.</p>
+                <p><strong style="color:#facc15;">Общая цена:</strong> {{ ticketDetails.totalPrice }} руб.</p>
+                <button id="buy-ticket-btn"
+                        style="margin-top:12px;background:#facc15;color:#222;font-weight:bold;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;"
+                        data-performance-id="{{ ticketDetails.performanceId }}"
+                        data-place-number="{{ ticketDetails.placeNumber }}"
+                        data-hall-number="{{ ticketDetails.hallNumber }}"
+                        data-price="{{ ticketDetails.totalPrice }}">Купить</button>
+            </div>
+        {% endif %}
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const buyButton = document.getElementById('buy-ticket-btn');
+                if (buyButton) {
+                    buyButton.addEventListener('click', () => {
+                        const data = {
+                            performanceId: buyButton.dataset.performanceId,
+                            placeNumber: buyButton.dataset.placeNumber,
+                            hallNumber: buyButton.dataset.hallNumber,
+                            price: buyButton.dataset.price
+                        };
+
+                        fetch('{{ path('app_ticketsell_buy') }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message);
+                                window.location.reload();
+                            } else {
+                                alert(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            alert('Произошла ошибка при покупке билета.');
+                            console.error(error);
+                        });
+                    });
+                }
+            });
+        </script>
     <script src="{{ asset('script/sidebar.js') }}"></script></body>
 </body>
 </html>

@@ -114,6 +114,7 @@ class HomeController extends AbstractController{
                     'email' => $email,
                     'role' => $role,
                 ]);
+                dump($session->get('user'));
                 return $this->redirectToRoute('app_profile');
             } else {
                 $error = $user ? 'Неверный пароль.' : 'Пользователь не найден.';
@@ -126,14 +127,24 @@ class HomeController extends AbstractController{
     }
 
     #[Route('/profile', name: 'app_profile')]
-    public function profile(SessionInterface $session): Response{
+    public function profile(SessionInterface $session, TicketRepository $ticketRepository): Response{
         $user = $session->get('user');
         if (!$user) {
             $this->addFlash('error', 'Необходимо войти в аккаунт.');
             return $this->redirectToRoute('app_login');
         }
+
+        $tickets = [];
+        if ($user['role'] === 'viewer') {
+            $viewer = $this->viewerRepository->findOneByEmail($user['email']);
+            if ($viewer) {
+                $tickets = $ticketRepository->findBy(['viewer' => $viewer]);
+            }
+        }
+
         return $this->render('profile.html.twig', [
             'user' => $user,
+            'tickets' => $tickets,
         ]);
     }
 
@@ -145,54 +156,5 @@ class HomeController extends AbstractController{
     }
 
 
-    #[Route('/ticketsell', name: 'app_ticketsell')]
-    public function ticketSell(
-        Request $request,
-        SessionInterface $session,
-        TakePerformanceRepository $performanceRepository,
-        TicketRepository $ticketRepository,
-        PlaceRepository $placeRepository
-    ): Response {
-        if (!$session->get('user')) {
-            $this->addFlash('error', 'Необходимо войти в аккаунт.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        $performanceId = $request->query->get('performance');
-        if (!$performanceId) {
-            $this->addFlash('error', 'Не выбран спектакль.');
-            return $this->redirectToRoute('app_home');
-        }
-
-        $performance = $performanceRepository->find($performanceId);
-        if (!$performance) {
-            $this->addFlash('error', 'Спектакль не найден.');
-            return $this->redirectToRoute('app_home');
-        }
-
-        $hall = $performance->getHall();
-        $hallNumber = $hall ? $hall->getHallId() : '—';
-        $placesCount = $hall ? $hall->getHallCapacity() : 0;
-
-        $tickets = $ticketRepository->findBy(['performance' => $performance]);
-        $takenPlaces = [];
-        foreach ($tickets as $ticket) {
-            $place = $ticket->getPlace();
-            if ($place) {
-                $takenPlaces[] = $place->getPlaceNumber();
-            }
-        }
-
-        $places = [];
-        if ($hall) {
-            $places = $placeRepository->findBy(['hall' => $hall]);
-        }
-        return $this->render('sellticket.html.twig', [
-            'performance' => $performance,
-            'hallNumber' => $hallNumber,
-            'placesCount' => $placesCount,
-            'takenPlaces' => $takenPlaces,
-            'places' => $places,
-        ]);
-    }
+    
 }

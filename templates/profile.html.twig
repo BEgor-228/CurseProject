@@ -33,6 +33,37 @@
                 <p><strong>Email:</strong> {{ user.email }}</p>
                 <p><strong>Роль:</strong> {{ user.role == 'viewer' ? 'Пользователь' : user.role == 'manager' ? 'Менеджер' : 'Администратор' }}</p>
             </div>
+            {% if user.role == 'viewer' and tickets is not empty %}
+                <h3>Купленные билеты</h3>
+                <table border="1" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Дата покупки</th>
+                            <th>Дата спектакля</th>
+                            <th>Название</th>
+                            <th>Продолжительность</th>
+                            <th>Номер зала</th>
+                            <th>Номер места</th>
+                            <th>Цена</th>
+                            <th>Код билета</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                            <tr>
+                                <td>{{ ticket.ticketPurchaseDate|date('Y-m-d') }}</td>
+                                <td>{{ ticket.performance.performanceData|date('Y-m-d') }}</td>
+                                <td>{{ ticket.performance.performanceTitle }}</td>
+                                <td>{{ ticket.performance.performanceDuration|date('H:i') }}</td>
+                                <td>{{ ticket.hall.hallId }}</td>
+                                <td>{{ ticket.place.placeNumber }}</td>
+                                <td>{{ ticket.price }} руб.</td>
+                                <td>{{ ticket.ticketCode }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
             <div class="profile-actions">
                 <a href="{{ path('app_home') }}" class="filter-button">Вернуться</a>
                 <a href="{{ path('app_logout') }}" class="filter-button">Выйти</a>

@@ -15,8 +15,8 @@ class Ticket{
     #[ORM\Column(name: "Ticket_purchaseDate", type: "date")]
     private ?\DateTimeInterface $ticketPurchaseDate = null;
 
-    #[ORM\Column(name: "Ticket_hallNumber", type: "integer")]
-    private ?int $ticketHallNumber = null;
+    // #[ORM\Column(name: "Ticket_hallNumber", type: "integer")]
+    // private ?int $ticketHallNumber = null;
 
     #[ORM\ManyToOne(targetEntity: Viewer::class)]
     #[ORM\JoinColumn(name: "Viewer_ID", referencedColumnName: "Viewer_ID", nullable: false)]
@@ -33,6 +33,13 @@ class Ticket{
     #[ORM\ManyToOne(targetEntity: Performance::class)]
     #[ORM\JoinColumn(name: "Performance_ID", referencedColumnName: "Performance_ID", nullable: false)]
     private ?Performance $performance = null;
+    
+    #[ORM\Column(name: "price", type: "integer")]
+    private ?int $price = null;
+
+    #[ORM\Column(type: 'string', length: 10, unique: true)]
+    private string $ticketCode;
+
 
     public function getTicketId(): ?int{
         return $this->ticketId;
@@ -47,14 +54,14 @@ class Ticket{
         return $this;
     }
 
-    public function getTicketHallNumber(): ?int{
-        return $this->ticketHallNumber;
-    }
+    // public function getTicketHallNumber(): ?int{
+    //     return $this->ticketHallNumber;
+    // }
 
-    public function setTicketHallNumber(?int $ticketHallNumber): self{
-        $this->ticketHallNumber = $ticketHallNumber;
-        return $this;
-    }
+    // public function setTicketHallNumber(?int $ticketHallNumber): self{
+    //     $this->ticketHallNumber = $ticketHallNumber;
+    //     return $this;
+    // }
 
     public function getViewer(): ?Viewer {
         return $this->viewer;
@@ -89,6 +96,27 @@ class Ticket{
 
     public function setPerformance(?Performance $performance): self{
         $this->performance = $performance;
+        return $this;
+    }
+
+    public function getPrice(): ?int{
+        return $this->price;
+    }
+
+    public function setPrice(?int $price): self{
+        $this->price = $price;
+        return $this;
+    }
+
+    public function getTicketCode(): string{
+        return $this->ticketCode;
+    }
+
+    public function setTicketCode(string $ticketCode): self{
+        if (!preg_match('/^[A-Za-z0-9]{10}$/', $ticketCode)) {
+            throw new \InvalidArgumentException('Код билета должен состоять ровно из 10 буквенно-цифровых символов');
+        }
+        $this->ticketCode = $ticketCode;
         return $this;
     }
 }
