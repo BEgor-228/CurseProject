@@ -64,6 +64,11 @@
                     </tbody>
                 </table>
             {% endif %}
+            {% if user.role == 'manager' %}
+                <div class="manager-actions">
+                    <a href="{{ path('app_performances') }}" class="btn">Изменить репертуар</a>
+                </div>
+            {% endif %}
             <div class="profile-actions">
                 <a href="{{ path('app_home') }}" class="filter-button">Вернуться</a>
                 <a href="{{ path('app_logout') }}" class="filter-button">Выйти</a>
