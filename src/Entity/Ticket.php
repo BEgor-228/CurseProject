@@ -54,15 +54,6 @@ class Ticket{
         return $this;
     }
 
-    // public function getTicketHallNumber(): ?int{
-    //     return $this->ticketHallNumber;
-    // }
-
-    // public function setTicketHallNumber(?int $ticketHallNumber): self{
-    //     $this->ticketHallNumber = $ticketHallNumber;
-    //     return $this;
-    // }
-
     public function getViewer(): ?Viewer {
         return $this->viewer;
     }

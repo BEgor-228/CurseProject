@@ -12,6 +12,8 @@ use App\Repository\HallRepository;
 use App\Repository\TicketRepository;
 use App\Repository\PlaceRepository;
 use App\Repository\ManagerRepository;
+// use App\Repository\ViewerRepository;
+use App\Repository\AdministratorRepository;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,59 +75,15 @@ class HomeController extends AbstractController{
         return $this->redirectToRoute('app_home');
     }
 
-    // #[Route('/ticketsell', name: 'app_ticketsell')]
-    // public function ticketSell(
-    //     Request $request,
-    //     SessionInterface $session,
-    //     TakePerformanceRepository $performanceRepository,
-    //     TicketRepository $ticketRepository,
-    //     PlaceRepository $placeRepository
-    // ): Response{
-    //     if (!$session->get('user')) {
-    //         $this->addFlash('error', 'Необходимо войти в аккаунт.');
-    //         return $this->redirectToRoute('app_login');
-    //     }
-    //     $performanceId = $request->query->get('performance');
-    //     if (!$performanceId) {
-    //         $this->addFlash('error', 'Не выбран спектакль.');
-    //         return $this->redirectToRoute('app_home');
-    //     }
-    //     $performance = $performanceRepository->find($performanceId);
-    //     if (!$performance) {
-    //         $this->addFlash('error', 'Спектакль не найден.');
-    //         return $this->redirectToRoute('app_home');
-    //     }
-    //     $hall = $performance->getHall();
-    //     $hallNumber = $hall ? $hall->getHallId() : '—';
-    //     $placesCount = $hall ? $hall->getHallCapacity() : 0;
-    //     $tickets = $ticketRepository->findBy(['performance' => $performance]);
-    //     $takenPlaces = [];
-    //     foreach ($tickets as $ticket) {
-    //         $place = $ticket->getPlace();
-    //         if ($place) {
-    //             $takenPlaces[] = $place->getPlaceNumber();
-    //         }
-    //     }
-    //     $places = [];
-    //     if ($hall) {
-    //         $places = $placeRepository->findBy(['hall' => $hall]);
-    //     }
-    //     return $this->render('sellticket.html.twig', [
-    //         'performance' => $performance,
-    //         'hallNumber' => $hallNumber,
-    //         'placesCount' => $placesCount,
-    //         'takenPlaces' => $takenPlaces,
-    //         'places' => $places,
-    //     ]);
-    // }
-
     //Для редактирования спектаклей
     #[Route('/performances', name: 'app_performances', methods: ['GET', 'POST'])]
     public function performances(
         Request $request,
         TakePerformanceRepository $performanceRepository,
         RepertoireRepository $repertoireRepository,
-        HallRepository $hallRepository
+        HallRepository $hallRepository,
+        SessionInterface $session,
+        ManagerRepository $managerRepository
     ): Response {
         if ($request->isMethod('POST')) {
             $result = $this->performanceService->handlePerformancesPost(
@@ -139,6 +97,13 @@ class HomeController extends AbstractController{
                 return $this->redirectToRoute('app_performances', ['repertoire' => $result['repertoire']]);
             }
         }
+
+        $userData = $session->get('user');
+        $user = null;
+        if ($userData && $userData['role'] === 'manager') {
+            // Получаем объект менеджера по email
+            $user = $managerRepository->findOneBy(['managerMail' => $userData['email']]);
+        }
         $data = $this->performanceService->getPerformancesData(
             $request,
             $this->entityManager,
@@ -146,6 +111,7 @@ class HomeController extends AbstractController{
             $repertoireRepository,
             $hallRepository
         );
+        $data['user'] = $user;
         return $this->render('performances.html.twig', $data);
     }
 
@@ -153,58 +119,52 @@ class HomeController extends AbstractController{
     public function changeRepertoire(
         Request $request,
         RepertoireRepository $repertoireRepository,
-        ManagerRepository $managerRepository,
+        AdministratorRepository $administratorRepository,
         EntityManagerInterface $entityManager,
         SessionInterface $session
     ): Response {
         $repertoires = $repertoireRepository->findAll();
-        $managers = $managerRepository->findAll();
+        $administrators = $administratorRepository->findAll();
         $error = null;
 
         if ($request->isMethod('POST')) {
             $data = $request->request->all();
 
-            // Обновление существующих репертуаров
             if (isset($data['repertoires'])) {
                 foreach ($data['repertoires'] as $id => $fields) {
                     $rep = $repertoireRepository->find($id);
                     if ($rep) {
                         $rep->setRepertoireTitle($fields['title']);
                         $rep->setRepertoireSize((int)$fields['size']);
-                        $manager = $managerRepository->find($fields['manager']);
-                        if ($manager) {
-                            $rep->setManager($manager);
+                        $administrator = $administratorRepository->find($fields['administrator']);
+                        if ($administrator) {
+                            $rep->setAdministrator($administrator);
                         }
-                        // Сохраняем adminmessage
-                        $rep->setRepertoireAdminMessage($fields['adminmessage'] ?? null);
                         $entityManager->persist($rep);
                     }
                 }
             }
-
-            // Добавление нового репертуара
             if (
                 !empty($data['new_title']) &&
                 !empty($data['new_size']) &&
-                !empty($data['new_manager'])
+                !empty($data['new_administrator'])
             ) {
                 $newRep = new \App\Entity\Repertoire();
                 $newRep->setRepertoireTitle($data['new_title']);
                 $newRep->setRepertoireSize((int)$data['new_size']);
-                $manager = $managerRepository->find($data['new_manager']);
-                if ($manager) {
-                    $newRep->setManager($manager);
-                    // Сохраняем adminmessage для нового
-                    $newRep->setRepertoireAdminMessage($data['new_adminmessage'] ?? null);
+                $administrator = $administratorRepository->find($data['new_administrator']);
+                if ($administrator) {
+                    $newRep->setAdministrator($administrator);
+                    // Удалено: $newRep->setRepertoireAdminMessage($data['new_adminmessage'] ?? null);
                     $entityManager->persist($newRep);
                 } else {
-                    $error = 'Выберите менеджера для нового репертуара!';
+                    $error = 'Выберите администратора для нового репертуара!';
                 }
             }
             elseif (
                 !empty($data['new_title']) ||
                 !empty($data['new_size']) ||
-                !empty($data['new_manager'])
+                !empty($data['new_administrator'])
             ) {
                 $error = 'Для добавления нового репертуара заполните все поля!';
             }
@@ -214,21 +174,23 @@ class HomeController extends AbstractController{
                 return $this->redirectToRoute('app_change_repertoire');
             }
         }
-
         $user = $session->get('user');
         $currentAdminId = null;
         if ($user && $user['role'] === 'admin') {
-            // Получить объект администратора по email или id
-            // Например, если email:
             $admin = $entityManager->getRepository(\App\Entity\Administrator::class)->findOneBy(['administratorMail' => $user['email']]);
             if ($admin) {
                 $currentAdminId = $admin->getAdministratorId();
             }
         }
+        $repertoires = $currentAdminId
+            ? $repertoireRepository->findBy(['administrator' => $currentAdminId])
+            : [];
+        $administrators = $administratorRepository->findAll();
+        $error = null;
 
         return $this->render('changeRepertoire.html.twig', [
             'repertoires' => $repertoires,
-            'managers' => $managers,
+            'administrators' => $administrators,
             'error' => $error,
             'currentAdminId' => $currentAdminId,
         ]);

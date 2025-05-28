@@ -10,8 +10,7 @@ class RepertoireRepository extends ServiceEntityRepository{
     public function __construct(ManagerRegistry $registry){
         parent::__construct($registry, Repertoire::class);
     }
-
-    public function findByManager(int $managerId): array{
-        return $this->findBy(['manager' => $managerId]);
+    public function findByAdministrator(int $administratorId): array{
+        return $this->findBy(['administrator' => $administratorId]);
     }
 }

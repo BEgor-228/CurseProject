@@ -26,7 +26,7 @@
             background: #444 !important;
             opacity: 1 !important;
             width: 100% !important;
-            appearance: auto !important; /* Вернуть стрелку */
+            appearance: auto !important;
         }
     </style>
 </head>
@@ -55,8 +55,7 @@
                         <tr>
                             <th>Название</th>
                             <th>Размер</th>
-                            <th>Менеджер</th>
-                            <th>Сообщение администратора</th>
+                            <th>Администратор</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -69,28 +68,8 @@
                                     <input type="number" name="repertoires[{{ rep.repertoireId }}][size]" value="{{ rep.repertoireSize }}" required>
                                 </td>
                                 <td>
-                                    {% if rep.manager.administrator.administratorId == currentAdminId %}
-                                        <select name="repertoires[{{ rep.repertoireId }}][manager]" required>
-                                            {% for manager in managers %}
-                                                {% if manager.administrator.administratorId == currentAdminId %}
-                                                    <option value="{{ manager.managerId }}" {{ manager.managerId == rep.manager.managerId ? 'selected' : '' }}>
-                                                        {{ manager.managerFullname }}
-                                                    </option>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                    {% else %}
-                                        <input type="text" value="{{ rep.manager.managerFullname }}" disabled>
-                                        <input type="hidden" name="repertoires[{{ rep.repertoireId }}][manager]" value="{{ rep.manager.managerId }}">
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if rep.manager.administrator.administratorId == currentAdminId %}
-                                        <input type="text" name="repertoires[{{ rep.repertoireId }}][adminmessage]" value="{{ rep.repertoireAdminMessage }}">
-                                    {% else %}
-                                        <input type="text" value="{{ rep.repertoireAdminMessage }}" disabled>
-                                        <input type="hidden" name="repertoires[{{ rep.repertoireId }}][adminmessage]" value="{{ rep.repertoireAdminMessage }}">
-                                    {% endif %}
+                                    <input type="text" value="{{ rep.administrator.administratorFullname }}" disabled>
+                                    <input type="hidden" name="repertoires[{{ rep.repertoireId }}][administrator]" value="{{ rep.administrator.administratorId }}">
                                 </td>
                             </tr>
                         {% endfor %}
@@ -98,22 +77,18 @@
                             <td><input type="text" name="new_title" placeholder="Новое название"></td>
                             <td><input type="number" name="new_size" placeholder="Размер"></td>
                             <td>
-                                <select name="new_manager">
-                                    <option value="">Менеджер</option>
-                                    {% for manager in managers %}
-                                        <option value="{{ manager.managerId }}">{{ manager.managerFullname }}</option>
+                                <select name="new_administrator">
+                                    <option value="">Администратор</option>
+                                    {% for administrator in administrators %}
+                                        <option value="{{ administrator.administratorId }}">{{ administrator.administratorFullname }}</option>
                                     {% endfor %}
                                 </select>
-                            </td>
-                            <td>
-                                <input type="text" name="new_adminmessage" placeholder="Сообщение администратора">
                             </td>
                         </tr>
                     </tbody>
                 </table>
                 <button type="submit" class="btn">Сохранить изменения</button>
             </form>
-            {# <a href="{{ path('app_profile') }}" class="btn">Вернуться</a> #}
         </div>
     </div>
 </body>

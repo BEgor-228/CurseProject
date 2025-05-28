@@ -33,9 +33,11 @@
                 <select name="repertoire" id="repertoire" onchange="this.form.submit()">
                     <option value="">-- Выберите репертуар --</option>
                     {% for repertoire in repertoires %}
-                        <option value="{{ repertoire.repertoireId }}" {{ repertoire.repertoireId == selectedRepertoireId ? 'selected' : '' }}>
-                            {{ repertoire.repertoireTitle }}
-                        </option>
+                        {% if repertoire.administrator.administratorId == user.administrator.administratorId %}
+                            <option value="{{ repertoire.repertoireId }}" {{ repertoire.repertoireId == selectedRepertoireId ? 'selected' : '' }}>
+                                {{ repertoire.repertoireTitle }}
+                            </option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </form>
@@ -140,7 +142,7 @@
         }
         th {
             background-color: #FFD600;
-            color:rgb(11, 11, 9); /* Ярко-жёлтый цвет как у SocialTheater */
+            color:rgb(11, 11, 9);
             font-weight: bold;
         }
         .btn {

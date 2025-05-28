@@ -18,12 +18,9 @@ class Repertoire{
     #[ORM\Column(name: "Repertoire_size", type: "integer")]
     private ?int $repertoireSize = null;
 
-    #[ORM\ManyToOne(targetEntity: Manager::class)]
-    #[ORM\JoinColumn(name: "Manager_ID", referencedColumnName: "Manager_ID", nullable: false)]
-    private ?Manager $manager = null;
-
-    #[ORM\Column(name: "Repertoire_adminmessage", type: "string", length: 1000, nullable: true)]
-    private ?string $repertoireAdminMessage = null;
+    #[ORM\ManyToOne(targetEntity: Administrator::class)]
+    #[ORM\JoinColumn(name: "Administrator_ID", referencedColumnName: "Administrator_ID", nullable: false)]
+    private ?Administrator $administrator = null;
 
     public function getRepertoireId(): ?int{
         return $this->repertoireId;
@@ -47,21 +44,12 @@ class Repertoire{
         return $this;
     }
 
-    public function getManager(): ?Manager{
-        return $this->manager;
+    public function getAdministrator(): ?Administrator{
+        return $this->administrator;
     }
 
-    public function setManager(?Manager $manager): self{
-        $this->manager = $manager;
-        return $this;
-    }
-
-    public function getRepertoireAdminMessage(): ?string{
-        return $this->repertoireAdminMessage;
-    }
-
-    public function setRepertoireAdminMessage(?string $repertoireAdminMessage): self{
-        $this->repertoireAdminMessage = $repertoireAdminMessage;
+    public function setAdministrator(?Administrator $administrator): self{
+        $this->administrator = $administrator;
         return $this;
     }
 }

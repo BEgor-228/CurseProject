@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-    <!-- Navigation Menu -->
     <nav class="nav-sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2 class="nav-logo">SocialTheater</h2>
@@ -35,23 +34,15 @@
         </ul>
     </nav>
 
-    <!-- Content Wrapper -->
     <div class="content-wrapper" id="content-wrapper">
-        <!-- Mobile Navigation -->
         <div class="mobile-nav">
             <a href="/" class="mobile-nav-link">Главная</a>
             <a href="/about" class="mobile-nav-link">О театре</a>
-            {# <a href="/repertoire" class="mobile-nav-link">Репертуар</a> #}
-            {# <a href="/tickets" class="mobile-nav-link">Купить билеты</a> #}
             <li><a href="{{ path('register_select') }}" class="nav-link">Регистрация</a></li>
             <a href="#" class="mobile-nav-link">Войти</a>
         </div>
-
-        <!-- Main Content -->
         <div class="main-content">
             <h1>Добро пожаловать в SocialTheater!</h1>
-
-            <!-- Filters -->
             <div class="filters">
                 <form id="filter-form" method="get" action="{{ path('app_home') }}">
                     <select name="repertoire" class="filter-select">
@@ -73,7 +64,6 @@
                 </form>
             </div>
 
-            <!-- Performances List -->
             <div class="performances-grid">
                 {% for performance in performances %}
                     <div class="performance-card">
@@ -94,8 +84,6 @@
                     <p class="no-performances">Нет доступных спектаклей для выбранного репертуара.</p>
                 {% endfor %}
             </div>
-
-            <!-- Interactive Hall Scheme (Placeholder) -->
             <div class="hall-section">
                 <h2>Выберите места</h2>
                 <div class="hall-placeholder">
@@ -104,7 +92,6 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             <p>Контакты: телефон администратора: 89046862432</p>
             <p>Почта администратора: egorbezrukavnikov@gmail.com</p>
