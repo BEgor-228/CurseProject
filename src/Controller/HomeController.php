@@ -2,24 +2,24 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\ListEntity;
 use App\Entity\Performance;
-use App\Repository\TakePerformanceRepository;
+use App\Repository\HallRepository;
+use App\Repository\PlaceRepository;
+use App\Repository\TicketRepository;
 use App\Repository\ViewerRepository;
 use App\Repository\ManagerRepository;
-use App\Repository\AdministratorRepository;
-use App\Repository\TicketRepository;
-use App\Repository\PlaceRepository;
-use App\Repository\HallRepository;
 use App\Repository\RepertoireRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\AdministratorRepository;
+use App\Repository\TakePerformanceRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class HomeController extends AbstractController
-{
+class HomeController extends AbstractController{
     private ViewerRepository $viewerRepository;
     private ManagerRepository $managerRepository;
     private AdministratorRepository $administratorRepository;
@@ -41,8 +41,7 @@ class HomeController extends AbstractController
     }
 
     #[Route('/', name: 'app_home')]
-    public function index(Request $request, TakePerformanceRepository $performanceRepository): Response
-    {
+    public function index(Request $request, TakePerformanceRepository $performanceRepository): Response{
         $repertoires = $performanceRepository->findAllRepertoires();
         $selectedRepertoireId = $request->query->get('repertoire');
         $selectedGenre = $request->query->get('genre');
@@ -68,14 +67,12 @@ class HomeController extends AbstractController
     }
 
     #[Route('/about', name: 'app_about')]
-    public function about(): Response
-    {
+    public function about(): Response{
         return $this->render('about.html.twig');
     }
 
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
-    public function login(Request $request, SessionInterface $session): Response
-    {
+    public function login(Request $request, SessionInterface $session): Response{
         $error = null;
 
         if ($request->isMethod('POST')) {
@@ -140,8 +137,7 @@ class HomeController extends AbstractController
     }
 
     #[Route('/profile', name: 'app_profile')]
-    public function profile(SessionInterface $session, TicketRepository $ticketRepository): Response
-    {
+    public function profile(SessionInterface $session, TicketRepository $ticketRepository): Response{
         $user = $session->get('user');
         if (!$user) {
             $this->addFlash('error', 'Необходимо войти в аккаунт.');
@@ -163,8 +159,7 @@ class HomeController extends AbstractController
     }
 
     #[Route('/logout', name: 'app_logout')]
-    public function logout(SessionInterface $session): Response
-    {
+    public function logout(SessionInterface $session): Response{
         $session->clear();
         $this->addFlash('success', 'Вы успешно вышли.');
         return $this->redirectToRoute('app_home');
@@ -177,8 +172,7 @@ class HomeController extends AbstractController
         TakePerformanceRepository $performanceRepository,
         TicketRepository $ticketRepository,
         PlaceRepository $placeRepository
-    ): Response
-    {
+    ): Response{
         if (!$session->get('user')) {
             $this->addFlash('error', 'Необходимо войти в аккаунт.');
             return $this->redirectToRoute('app_login');
@@ -222,6 +216,7 @@ class HomeController extends AbstractController
         ]);
     }
 
+    //Для редактирования спектаклей
     #[Route('/performances', name: 'app_performances', methods: ['GET', 'POST'])]
     public function performances(
         Request $request,
@@ -233,9 +228,75 @@ class HomeController extends AbstractController
         $repertoires = $repertoireRepository->findAll();
         $halls = $hallRepository->findAll();
         $selectedRepertoireId = $request->get('repertoire');
+        $error = null;
 
-        // Обработка POST-запроса — сохранение спектаклей
+        // Для формы "Добавить спектакль"
+        $allPerformances = $performanceRepository->findAll();
+        $performances = [];
+        $availablePerformances = [];
+
+        if ($selectedRepertoireId) {
+            // Получить спектакли в репертуаре
+            $performances = $entityManager->createQueryBuilder()
+                ->select('p')
+                ->from(\App\Entity\Performance::class, 'p')
+                ->join('p.lists', 'l')
+                ->where('l.repertoire = :repertoireId')
+                ->setParameter('repertoireId', $selectedRepertoireId)
+                ->getQuery()
+                ->getResult();
+
+            // Получить спектакли, которых нет в репертуаре
+            $performancesIds = array_map(fn($p) => $p->getPerformanceId(), $performances);
+            $availablePerformances = array_filter($allPerformances, function($p) use ($performancesIds) {
+                return !in_array($p->getPerformanceId(), $performancesIds);
+            });
+        }
+
+        // Обработка POST-запроса
         if ($request->isMethod('POST')) {
+            $action = $request->request->get('action');
+            $repertoire = $selectedRepertoireId ? $repertoireRepository->find($selectedRepertoireId) : null;
+
+            // Добавить спектакль
+            if ($action === 'add' && $repertoire) {
+                $addPerformanceId = $request->request->get('add_performance_id');
+                $performance = $performanceRepository->find($addPerformanceId);
+                if ($performance) {
+                    // Проверить, нет ли уже такой связи
+                    $existing = $entityManager->getRepository(ListEntity::class)->findOneBy([
+                        'performance' => $performance,
+                        'repertoire' => $repertoire
+                    ]);
+                    if (!$existing) {
+                        $listEntity = new ListEntity();
+                        $listEntity->setPerformance($performance);
+                        $listEntity->setRepertoire($repertoire);
+                        $entityManager->persist($listEntity);
+                        $entityManager->flush();
+                    }
+                }
+                return $this->redirectToRoute('app_performances', ['repertoire' => $selectedRepertoireId]);
+            }
+
+            // Удалить спектакль
+            if (str_starts_with($action, 'delete_') && $repertoire) {
+                $deleteId = (int)str_replace('delete_', '', $action);
+                $performance = $performanceRepository->find($deleteId);
+                if ($performance) {
+                    $listEntity = $entityManager->getRepository(ListEntity::class)->findOneBy([
+                        'performance' => $performance,
+                        'repertoire' => $repertoire
+                    ]);
+                    if ($listEntity) {
+                        $entityManager->remove($listEntity);
+                        $entityManager->flush();
+                    }
+                }
+                return $this->redirectToRoute('app_performances', ['repertoire' => $selectedRepertoireId]);
+            }
+
+            // Сохранить изменения спектаклей
             $performancesData = $request->request->all('performances');
             foreach ($performancesData as $id => $fields) {
                 $performance = $performanceRepository->find($id);
@@ -247,32 +308,15 @@ class HomeController extends AbstractController
                     $performance->setPerformanceData(new \DateTime($fields['date']));
                     $performance->setPerformancePrice($fields['price']);
                     $performance->setPerformanceGenre($fields['genre']);
-                    
                     $hall = $hallRepository->find($fields['hall']);
                     if ($hall) {
                         $performance->setHall($hall);
                     }
-
                     $entityManager->persist($performance);
                 }
             }
             $entityManager->flush();
-
-            // Обновить страницу после сохранения
             return $this->redirectToRoute('app_performances', ['repertoire' => $selectedRepertoireId]);
-        }
-
-        // Для GET-запроса — показать спектакли
-        $performances = [];
-        if ($selectedRepertoireId) {
-            $performances = $entityManager->createQueryBuilder()
-                ->select('p')
-                ->from(Performance::class, 'p')
-                ->join('p.lists', 'l')
-                ->where('l.repertoire = :repertoireId')
-                ->setParameter('repertoireId', $selectedRepertoireId)
-                ->getQuery()
-                ->getResult();        
         }
 
         return $this->render('performances.html.twig', [
@@ -280,7 +324,8 @@ class HomeController extends AbstractController
             'selectedRepertoireId' => $selectedRepertoireId,
             'performances' => $performances,
             'halls' => $halls,
-            'error' => null,
+            'availablePerformances' => $availablePerformances,
+            'error' => $error,
         ]);
     }
 }

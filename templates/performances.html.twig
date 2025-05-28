@@ -7,98 +7,120 @@
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-    <header>
-        <div class="logo">SocialTheater</div>
-        <div class="menu-toggle">☰</div>
-    </header>
-
-    <nav class="main-nav">
-        <a href="{{ path('app_home') }}">Главная</a>
-        <a href="{{ path('app_about') }}">О театре</a>
-        <a href="{{ path('app_profile') }}">Личный кабинет</a>
-        <a href="{{ path('app_logout') }}">Выйти</a>
+    <nav class="nav-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 class="nav-logo">SocialTheater</h2>
+            <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        </div>
+        <ul class="nav-list">
+            <li><a href="{{ path('app_home') }}" class="nav-link">Главная</a></li>
+            <li><a href="{{ path('app_about') }}" class="nav-link">О театре</a></li>
+            <li><a href="{{ path('app_profile') }}" class="nav-link">Личный кабинет</a></li>
+            <li><a href="{{ path('app_logout') }}" class="nav-link">Выйти</a></li>
+        </ul>
     </nav>
 
-    <div class="content">
-        <h1>Редактировать репертуар</h1>
+    <div class="content-wrapper" id="content-wrapper">
+        <div class="main-content">
+            <h1>Редактировать репертуар</h1>
 
-        {% if error %}
-            <div class="error">{{ error }}</div>
-        {% endif %}
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
 
-        <form method="get" action="{{ path('app_performances') }}">
-            <label for="repertoire">Выберите репертуар:</label>
-            <select name="repertoire" id="repertoire" onchange="this.form.submit()">
-                <option value="">-- Выберите репертуар --</option>
-                {% for repertoire in repertoires %}
-                    <option value="{{ repertoire.repertoireId }}" {{ repertoire.repertoireId == selectedRepertoireId ? 'selected' : '' }}>
-                        {{ repertoire.repertoireTitle }}
-                    </option>
-                {% endfor %}
-            </select>
-        </form>
-
-        {% if performances is not empty %}
-            <form method="post" action="{{ path('app_performances') }}">
-                <input type="hidden" name="repertoire" value="{{ selectedRepertoireId }}">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Название</th>
-                            <th>Описание</th>
-                            <th>Список актеров</th>
-                            <th>Продолжительность</th>
-                            <th>Дата</th>
-                            <th>Цена</th>
-                            <th>Жанр</th>
-                            <th>Зал</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for performance in performances %}
-                            <tr>
-                                <td>
-                                    <input type="text" name="performances[{{ performance.performanceId }}][title]" value="{{ performance.performanceTitle }}" required>
-                                </td>
-                                <td>
-                                    <textarea name="performances[{{ performance.performanceId }}][description]">{{ performance.performanceDescription }}</textarea>
-                                </td>
-                                <td>
-                                    <textarea name="performances[{{ performance.performanceId }}][castList]">{{ performance.performanceCastList }}</textarea>
-                                </td>
-                                <td>
-                                    <input type="time" name="performances[{{ performance.performanceId }}][duration]" value="{{ performance.performanceDuration|date('H:i') }}" required>
-                                </td>
-                                <td>
-                                    <input type="date" name="performances[{{ performance.performanceId }}][date]" value="{{ performance.performanceData|date('Y-m-d') }}" required>
-                                </td>
-                                <td>
-                                    <input type="number" step="0.01" name="performances[{{ performance.performanceId }}][price]" value="{{ performance.performancePrice }}" required>
-                                </td>
-                                <td>
-                                    <input type="text" name="performances[{{ performance.performanceId }}][genre]" value="{{ performance.performanceGenre }}" required>
-                                </td>
-                                <td>
-                                    <select name="performances[{{ performance.performanceId }}][hall]" required>
-                                        {% for hall in halls %}
-                                            <option value="{{ hall.hallId }}" {{ performance.hall.hallId == hall.hallId ? 'selected' : '' }}>
-                                                Зал {{ hall.hallId }} (Вместимость: {{ hall.hallCapacity }})
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <button type="submit" class="btn">Сохранить</button>
+            <form method="get" action="{{ path('app_performances') }}">
+                <label for="repertoire">Выберите репертуар:</label>
+                <select name="repertoire" id="repertoire" onchange="this.form.submit()">
+                    <option value="">-- Выберите репертуар --</option>
+                    {% for repertoire in repertoires %}
+                        <option value="{{ repertoire.repertoireId }}" {{ repertoire.repertoireId == selectedRepertoireId ? 'selected' : '' }}>
+                            {{ repertoire.repertoireTitle }}
+                        </option>
+                    {% endfor %}
+                </select>
             </form>
-        {% else %}
-            <p>Нет спектаклей для выбранного репертуара.</p>
-        {% endif %}
+            {% if selectedRepertoireId %}
+                <h2>Добавить спектакль в репертуар</h2>
+                <form method="post" action="{{ path('app_performances') }}">
+                    <input type="hidden" name="repertoire" value="{{ selectedRepertoireId }}">
+                    <select name="add_performance_id" required>
+                        <option value="">-- Выберите спектакль --</option>
+                        {% for perf in availablePerformances %}
+                            <option value="{{ perf.performanceId }}">{{ perf.performanceTitle }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" name="action" value="add" class="btn">Добавить</button>
+                </form>
+            {% endif %}
 
-        <a href="{{ path('app_profile') }}" class="btn">Вернуться</a>
+            {% if performances is not empty %}
+                <form method="post" action="{{ path('app_performances') }}">
+                    <input type="hidden" name="repertoire" value="{{ selectedRepertoireId }}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Описание</th>
+                                <th>Список актеров</th>
+                                <th>Продолжительность</th>
+                                <th>Дата</th>
+                                <th>Цена</th>
+                                <th>Жанр</th>
+                                <th>Зал</th>
+                                <th>Удалить</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for performance in performances %}
+                                <tr>
+                                    <td>
+                                        <input type="text" name="performances[{{ performance.performanceId }}][title]" value="{{ performance.performanceTitle }}" required>
+                                    </td>
+                                    <td>
+                                        <textarea name="performances[{{ performance.performanceId }}][description]">{{ performance.performanceDescription }}</textarea>
+                                    </td>
+                                    <td>
+                                        <textarea name="performances[{{ performance.performanceId }}][castList]">{{ performance.performanceCastList }}</textarea>
+                                    </td>
+                                    <td>
+                                        <input type="time" name="performances[{{ performance.performanceId }}][duration]" value="{{ performance.performanceDuration|date('H:i') }}" required>
+                                    </td>
+                                    <td>
+                                        <input type="date" name="performances[{{ performance.performanceId }}][date]" value="{{ performance.performanceData|date('Y-m-d') }}" required>
+                                    </td>
+                                    <td>
+                                        <input type="number" step="0.01" name="performances[{{ performance.performanceId }}][price]" value="{{ performance.performancePrice }}" required>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="performances[{{ performance.performanceId }}][genre]" value="{{ performance.performanceGenre }}" required>
+                                    </td>
+                                    <td>
+                                        <select name="performances[{{ performance.performanceId }}][hall]" required>
+                                            {% for hall in halls %}
+                                                <option value="{{ hall.hallId }}" {{ performance.hall.hallId == hall.hallId ? 'selected' : '' }}>
+                                                    Зал {{ hall.hallId }} (Вместимость: {{ hall.hallCapacity }})
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="submit" name="action" value="delete_{{ performance.performanceId }}" class="btn" onclick="return confirm('Удалить спектакль из репертуара?');">Удалить</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn">Сохранить</button>
+                </form>
+            {% else %}
+                <p>Нет спектаклей для выбранного репертуара.</p>
+            {% endif %}
+
+            <a href="{{ path('app_profile') }}" class="btn">Вернуться</a>
+        </div>
     </div>
+
+    <script src="{{ asset('script/sidebar.js') }}"></script>
 
     <style>
         .content {
@@ -117,7 +139,9 @@
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #FFD600;
+            color:rgb(11, 11, 9); /* Ярко-жёлтый цвет как у SocialTheater */
+            font-weight: bold;
         }
         .btn {
             display: inline-block;

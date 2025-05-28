@@ -12,8 +12,8 @@ class ListEntity{
     #[ORM\Column(name: "List_ID", type: "integer")]
     private ?int $listId = null;
 
-    #[ORM\Column(name: "Title", type: "string", length: 30)]
-    private ?string $title = null;
+    // #[ORM\Column(name: "Title", type: "string", length: 30)]
+    // private ?string $title = null;
 
     #[ORM\ManyToOne(targetEntity: Performance::class)]
     #[ORM\JoinColumn(name: "Performance_ID", referencedColumnName: "Performance_ID", nullable: false)]
@@ -27,14 +27,14 @@ class ListEntity{
         return $this->listId;
     }
 
-    public function getTitle(): ?string{
-        return $this->title;
-    }
+    // public function getTitle(): ?string{
+    //     return $this->title;
+    // }
 
-    public function setTitle(?string $title): self{
-        $this->title = $title;
-        return $this;
-    }
+    // public function setTitle(?string $title): self{
+    //     $this->title = $title;
+    //     return $this;
+    // }
 
     public function getPerformance(): ?Performance{
         return $this->performance;
