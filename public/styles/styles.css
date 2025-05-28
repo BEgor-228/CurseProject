@@ -355,6 +355,7 @@ body {
     cursor: not-allowed;
 }
 
+
 /* Responsive Design */
 @media (min-width: 640px) {
     .filters {

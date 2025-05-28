@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Изменить репертуары</title>
+    <link rel="stylesheet" href="{{ asset('styles/styles.css') }}">
+    <style>
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            font-size: 1.2em;
+            padding: 0.2em 1em;
+        }
+        button.btn {
+            font-size: 1.3em;
+            padding: 0.2em 1.5em;
+        }
+        input[disabled], select[disabled] {
+            color: #fff !important;
+            background: #444 !important;
+            opacity: 1 !important;
+        }
+        select[disabled] {
+            color: #fff !important;
+            background: #444 !important;
+            opacity: 1 !important;
+            width: 100% !important;
+            appearance: auto !important; /* Вернуть стрелку */
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 class="nav-logo">SocialTheater</h2>
+            <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        </div>
+        <ul class="nav-list">
+            <li><a href="{{ path('app_home') }}" class="nav-link">Главная</a></li>
+            <li><a href="{{ path('app_about') }}" class="nav-link">О театре</a></li>
+            <li><a href="{{ path('app_logout') }}" class="nav-link">Выйти</a></li>
+        </ul>
+    </nav>
+
+    <div class="content-wrapper" id="content-wrapper">
+        <div class="main-content">
+            <h1>Редактирование репертуаров</h1>
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
+            <form method="post">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Размер</th>
+                            <th>Менеджер</th>
+                            <th>Сообщение администратора</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rep in repertoires %}
+                            <tr>
+                                <td>
+                                    <input type="text" name="repertoires[{{ rep.repertoireId }}][title]" value="{{ rep.repertoireTitle }}" required>
+                                </td>
+                                <td>
+                                    <input type="number" name="repertoires[{{ rep.repertoireId }}][size]" value="{{ rep.repertoireSize }}" required>
+                                </td>
+                                <td>
+                                    {% if rep.manager.administrator.administratorId == currentAdminId %}
+                                        <select name="repertoires[{{ rep.repertoireId }}][manager]" required>
+                                            {% for manager in managers %}
+                                                {% if manager.administrator.administratorId == currentAdminId %}
+                                                    <option value="{{ manager.managerId }}" {{ manager.managerId == rep.manager.managerId ? 'selected' : '' }}>
+                                                        {{ manager.managerFullname }}
+                                                    </option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    {% else %}
+                                        <input type="text" value="{{ rep.manager.managerFullname }}" disabled>
+                                        <input type="hidden" name="repertoires[{{ rep.repertoireId }}][manager]" value="{{ rep.manager.managerId }}">
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if rep.manager.administrator.administratorId == currentAdminId %}
+                                        <input type="text" name="repertoires[{{ rep.repertoireId }}][adminmessage]" value="{{ rep.repertoireAdminMessage }}">
+                                    {% else %}
+                                        <input type="text" value="{{ rep.repertoireAdminMessage }}" disabled>
+                                        <input type="hidden" name="repertoires[{{ rep.repertoireId }}][adminmessage]" value="{{ rep.repertoireAdminMessage }}">
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td><input type="text" name="new_title" placeholder="Новое название"></td>
+                            <td><input type="number" name="new_size" placeholder="Размер"></td>
+                            <td>
+                                <select name="new_manager">
+                                    <option value="">Менеджер</option>
+                                    {% for manager in managers %}
+                                        <option value="{{ manager.managerId }}">{{ manager.managerFullname }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="new_adminmessage" placeholder="Сообщение администратора">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="submit" class="btn">Сохранить изменения</button>
+            </form>
+            {# <a href="{{ path('app_profile') }}" class="btn">Вернуться</a> #}
+        </div>
+    </div>
+</body>
+</html>

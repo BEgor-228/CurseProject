@@ -11,6 +11,8 @@ use App\Repository\RepertoireRepository;
 use App\Repository\HallRepository;
 use App\Repository\TicketRepository;
 use App\Repository\PlaceRepository;
+use App\Repository\ManagerRepository;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -145,5 +147,90 @@ class HomeController extends AbstractController{
             $hallRepository
         );
         return $this->render('performances.html.twig', $data);
+    }
+
+    #[Route('/changeRepertoire', name: 'app_change_repertoire', methods: ['GET', 'POST'])]
+    public function changeRepertoire(
+        Request $request,
+        RepertoireRepository $repertoireRepository,
+        ManagerRepository $managerRepository,
+        EntityManagerInterface $entityManager,
+        SessionInterface $session
+    ): Response {
+        $repertoires = $repertoireRepository->findAll();
+        $managers = $managerRepository->findAll();
+        $error = null;
+
+        if ($request->isMethod('POST')) {
+            $data = $request->request->all();
+
+            // Обновление существующих репертуаров
+            if (isset($data['repertoires'])) {
+                foreach ($data['repertoires'] as $id => $fields) {
+                    $rep = $repertoireRepository->find($id);
+                    if ($rep) {
+                        $rep->setRepertoireTitle($fields['title']);
+                        $rep->setRepertoireSize((int)$fields['size']);
+                        $manager = $managerRepository->find($fields['manager']);
+                        if ($manager) {
+                            $rep->setManager($manager);
+                        }
+                        // Сохраняем adminmessage
+                        $rep->setRepertoireAdminMessage($fields['adminmessage'] ?? null);
+                        $entityManager->persist($rep);
+                    }
+                }
+            }
+
+            // Добавление нового репертуара
+            if (
+                !empty($data['new_title']) &&
+                !empty($data['new_size']) &&
+                !empty($data['new_manager'])
+            ) {
+                $newRep = new \App\Entity\Repertoire();
+                $newRep->setRepertoireTitle($data['new_title']);
+                $newRep->setRepertoireSize((int)$data['new_size']);
+                $manager = $managerRepository->find($data['new_manager']);
+                if ($manager) {
+                    $newRep->setManager($manager);
+                    // Сохраняем adminmessage для нового
+                    $newRep->setRepertoireAdminMessage($data['new_adminmessage'] ?? null);
+                    $entityManager->persist($newRep);
+                } else {
+                    $error = 'Выберите менеджера для нового репертуара!';
+                }
+            }
+            elseif (
+                !empty($data['new_title']) ||
+                !empty($data['new_size']) ||
+                !empty($data['new_manager'])
+            ) {
+                $error = 'Для добавления нового репертуара заполните все поля!';
+            }
+
+            $entityManager->flush();
+            if (!$error) {
+                return $this->redirectToRoute('app_change_repertoire');
+            }
+        }
+
+        $user = $session->get('user');
+        $currentAdminId = null;
+        if ($user && $user['role'] === 'admin') {
+            // Получить объект администратора по email или id
+            // Например, если email:
+            $admin = $entityManager->getRepository(\App\Entity\Administrator::class)->findOneBy(['administratorMail' => $user['email']]);
+            if ($admin) {
+                $currentAdminId = $admin->getAdministratorId();
+            }
+        }
+
+        return $this->render('changeRepertoire.html.twig', [
+            'repertoires' => $repertoires,
+            'managers' => $managers,
+            'error' => $error,
+            'currentAdminId' => $currentAdminId,
+        ]);
     }
 }

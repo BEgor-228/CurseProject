@@ -22,6 +22,9 @@ class Repertoire{
     #[ORM\JoinColumn(name: "Manager_ID", referencedColumnName: "Manager_ID", nullable: false)]
     private ?Manager $manager = null;
 
+    #[ORM\Column(name: "Repertoire_adminmessage", type: "string", length: 1000, nullable: true)]
+    private ?string $repertoireAdminMessage = null;
+
     public function getRepertoireId(): ?int{
         return $this->repertoireId;
     }
@@ -50,6 +53,15 @@ class Repertoire{
 
     public function setManager(?Manager $manager): self{
         $this->manager = $manager;
+        return $this;
+    }
+
+    public function getRepertoireAdminMessage(): ?string{
+        return $this->repertoireAdminMessage;
+    }
+
+    public function setRepertoireAdminMessage(?string $repertoireAdminMessage): self{
+        $this->repertoireAdminMessage = $repertoireAdminMessage;
         return $this;
     }
 }
