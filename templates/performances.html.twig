@@ -33,11 +33,9 @@
                 <select name="repertoire" id="repertoire" onchange="this.form.submit()">
                     <option value="">-- Выберите репертуар --</option>
                     {% for repertoire in repertoires %}
-                        {% if repertoire.administrator.administratorId == user.administrator.administratorId %}
-                            <option value="{{ repertoire.repertoireId }}" {{ repertoire.repertoireId == selectedRepertoireId ? 'selected' : '' }}>
-                                {{ repertoire.repertoireTitle }}
-                            </option>
-                        {% endif %}
+                        <option value="{{ repertoire.repertoireId }}" {{ repertoire.repertoireId == selectedRepertoireId ? 'selected' : '' }}>
+                            {{ repertoire.repertoireTitle }}
+                        </option>
                     {% endfor %}
                 </select>
             </form>

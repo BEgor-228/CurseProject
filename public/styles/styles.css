@@ -338,21 +338,125 @@ body {
     border-radius: 8px;
     margin-bottom: 20px;
 }
-
 .profile-info p {
     color: #e2e8f0;
     margin: 10px 0;
 }
-
 .profile-actions {
     display: flex;
     gap: 10px;
     justify-content: center;
 }
-
 .place-btn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+}
+.admin-section h3 {
+    color: #facc15;
+    margin-top: 0;
+}
+.admin-section {
+    background: #23272f;
+    border: 3px solid #facc15;
+    border-radius: 14px;
+    padding: 28px;
+    margin: 40px 0;
+    box-shadow: 0 4px 16px rgba(250,204,21,0.15);
+}
+.admin-divider {
+    border: none;
+    border-top: 4px solid #facc15;
+    margin: 32px 0;
+}
+.admin-add-box {
+    background: #1a1d23;
+    border: 2px dashed #facc15;
+    border-radius: 8px;
+    padding: 18px;
+    margin-top: 16px;
+}
+.filter-button {
+    background-color: #facc15 !important;
+    color: #222 !important;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 8px 0;
+    transition: background 0.2s;
+}
+.filter-button:hover {
+    background-color: #ffe066 !important;
+}
+
+/* .admin-commands-table {
+    margin: 32px auto !important;
+    border-collapse: collapse;
+    min-width: 500px;
+    background: #23272f;
+    border: 3px solid #facc15;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(250,204,21,0.08);
+}
+.admin-commands-table th, .admin-commands-table td {
+    border: 2px solid #facc15;
+    padding: 14px 22px;
+    text-align: center;
+    color: #fff;
+}
+.admin-commands-table th {
+    background: #facc15;
+    color: #23272f;
+    font-weight: bold;
+}
+.admin-commands-table td form .btn {
+    background-color: #facc15 !important;
+    color: #23272f !important;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.admin-commands-table td form .btn:hover {
+    background-color: #ffe066 !important;
+} */
+
+.admin-commands-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 600px; /* Ограничим ширину контейнера */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Уточняем стили для таблицы */
+.admin-commands-table {
+    margin: 0; /* Убираем margin, так как центрирование выполняет контейнер */
+    border-collapse: collapse;
+    min-width: 500px;
+    background: #23272f;
+    border: 3px solid #facc15;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(250,204,21,0.08);
+}
+
+.admin-commands-table th, .admin-commands-table td {
+    border: 2px solid #facc15;
+    padding: 14px 22px;
+    text-align: center;
+    color: #fff;
+}
+
+.admin-commands-table th {
+    background: #facc15;
+    color: #23272f;
+    font-weight: bold;
 }
 
 

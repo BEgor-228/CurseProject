@@ -75,8 +75,6 @@ class HomeController extends AbstractController
         $commands = [];
         $managers = [];
         $currentAdminId = null;
-        $adminPerformances = [];
-        $adminManagers = [];
         $administrators = [];
 
         if ($userData && $userData['role'] === 'manager') {
@@ -95,20 +93,6 @@ class HomeController extends AbstractController
                 $commands = $commandRepository->findBy(['administrator' => $admin]);
                 // Все менеджеры, подчинённые этому админу
                 $managers = $managerRepository->findBy(['administrator' => $admin]);
-                // Получить все репертуары этого администратора
-                $repertoires = $repertoireRepository->findBy(['administrator' => $currentAdminId]);
-                // Получить все записи ListEntity для этих репертуаров
-                $listRepository = $this->entityManager->getRepository(\App\Entity\ListEntity::class);
-                $lists = $listRepository->findBy(['repertoire' => $repertoires]);
-                // Собрать все спектакли
-                foreach ($lists as $list) {
-                    $performance = $list->getPerformance();
-                    if ($performance) {
-                        $adminPerformances[] = $performance;
-                    }
-                }
-                // Получить всех менеджеров этого администратора
-                $adminManagers = $managerRepository->findBy(['administrator' => $currentAdminId]);
                 $administrators = $administratorRepository->findAll();
             }
         }
@@ -116,8 +100,6 @@ class HomeController extends AbstractController
         $result['admin_commands'] = $commands;
         $result['admin_managers'] = $managers;
         $result['commands'] = $commands;
-        $result['admin_performances'] = $adminPerformances;
-        $result['admin_managers'] = $adminManagers;
         $result['administrators'] = $administrators;
         $result['currentAdminId'] = $currentAdminId;
 
@@ -162,9 +144,15 @@ class HomeController extends AbstractController
 
         $userData = $session->get('user');
         $user = null;
+        $repertoires = [];
         if ($userData && $userData['role'] === 'manager') {
             $user = $managerRepository->findOneBy(['managerMail' => $userData['email']]);
+            if ($user) {
+                // Получаем только репертуары, где manager совпадает с текущим менеджером
+                $repertoires = $repertoireRepository->findBy(['manager' => $user]);
+            }
         }
+
         $data = $this->performanceService->getPerformancesData(
             $request,
             $this->entityManager,
@@ -173,6 +161,8 @@ class HomeController extends AbstractController
             $hallRepository
         );
         $data['user'] = $user;
+        $data['repertoires'] = $repertoires; // перезаписываем только свои репертуары
+
         return $this->render('performances.html.twig', $data);
     }
 
@@ -181,15 +171,19 @@ class HomeController extends AbstractController
         Request $request,
         RepertoireRepository $repertoireRepository,
         AdministratorRepository $administratorRepository,
+        ManagerRepository $managerRepository,
         EntityManagerInterface $entityManager,
         SessionInterface $session
     ): Response {
         $user = $session->get('user');
         $currentAdminId = null;
+        $adminManagers = [];
         if ($user && $user['role'] === 'admin') {
             $admin = $entityManager->getRepository(\App\Entity\Administrator::class)->findOneBy(['administratorMail' => $user['email']]);
             if ($admin) {
                 $currentAdminId = $admin->getAdministratorId();
+                // Получаем менеджеров этого администратора
+                $adminManagers = $managerRepository->findBy(['administrator' => $currentAdminId]);
             }
         }
         $repertoires = $currentAdminId
@@ -211,30 +205,41 @@ class HomeController extends AbstractController
                         if ($administrator) {
                             $rep->setAdministrator($administrator);
                         }
+                        // Сохраняем выбранного менеджера для репертуара, если есть поле manager
+                        if (isset($fields['manager'])) {
+                            $manager = $managerRepository->find($fields['manager']);
+                            if ($manager) {
+                                $rep->setManager($manager);
+                            }
+                        }
                         $entityManager->persist($rep);
                     }
                 }
             }
             if (
                 !empty($data['new_title']) &&
-                !empty($data['new_size']) &&
-                !empty($data['new_administrator'])
+                !empty($data['new_size'])
             ) {
                 $newRep = new \App\Entity\Repertoire();
                 $newRep->setRepertoireTitle($data['new_title']);
                 $newRep->setRepertoireSize((int)$data['new_size']);
-                $administrator = $administratorRepository->find($data['new_administrator']);
-                if ($administrator) {
+                if ($currentAdminId) {
+                    $administrator = $administratorRepository->find($currentAdminId);
                     $newRep->setAdministrator($administrator);
+                    if (!empty($data['new_manager'])) {
+                        $manager = $managerRepository->find($data['new_manager']);
+                        if ($manager) {
+                            $newRep->setManager($manager);
+                        }
+                    }
                     $entityManager->persist($newRep);
                 } else {
-                    $error = 'Выберите администратора для нового репертуара!';
+                    $error = 'Ошибка: не найден администратор!';
                 }
             }
             elseif (
                 !empty($data['new_title']) ||
-                !empty($data['new_size']) ||
-                !empty($data['new_administrator'])
+                !empty($data['new_size'])
             ) {
                 $error = 'Для добавления нового репертуара заполните все поля!';
             }
@@ -248,6 +253,7 @@ class HomeController extends AbstractController
         return $this->render('changeRepertoire.html.twig', [
             'repertoires' => $repertoires,
             'administrators' => $administrators,
+            'admin_managers' => $adminManagers, // <-- передаём менеджеров этого администратора
             'error' => $error,
             'currentAdminId' => $currentAdminId,
         ]);

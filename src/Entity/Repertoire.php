@@ -22,6 +22,10 @@ class Repertoire{
     #[ORM\JoinColumn(name: "Administrator_ID", referencedColumnName: "Administrator_ID", nullable: false)]
     private ?Administrator $administrator = null;
 
+    #[ORM\ManyToOne(targetEntity: Manager::class)]
+    #[ORM\JoinColumn(name: "Manager_ID", referencedColumnName: "Manager_ID", nullable: true)]
+    private ?Manager $manager = null;
+
     public function getRepertoireId(): ?int{
         return $this->repertoireId;
     }
@@ -50,6 +54,15 @@ class Repertoire{
 
     public function setAdministrator(?Administrator $administrator): self{
         $this->administrator = $administrator;
+        return $this;
+    }
+
+    public function getManager(): ?Manager {
+        return $this->manager;
+    }
+    
+    public function setManager(?Manager $manager): self {
+        $this->manager = $manager;
         return $this;
     }
 }

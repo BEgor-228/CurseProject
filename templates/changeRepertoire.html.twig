@@ -40,6 +40,7 @@
             <li><a href="{{ path('app_home') }}" class="nav-link">Главная</a></li>
             <li><a href="{{ path('app_about') }}" class="nav-link">О театре</a></li>
             <li><a href="{{ path('app_logout') }}" class="nav-link">Выйти</a></li>
+            <li><a href="{{ path('app_profile') }}" class="nav-link">Личный кабинет</a></li>
         </ul>
     </nav>
 
@@ -56,6 +57,7 @@
                             <th>Название</th>
                             <th>Размер</th>
                             <th>Администратор</th>
+                            <th>Менеджер</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,16 +73,39 @@
                                     <input type="text" value="{{ rep.administrator.administratorFullname }}" disabled>
                                     <input type="hidden" name="repertoires[{{ rep.repertoireId }}][administrator]" value="{{ rep.administrator.administratorId }}">
                                 </td>
+                                <td>
+                                    <select name="repertoires[{{ rep.repertoireId }}][manager]">
+                                        <option value="">Менеджер</option>
+                                        {% for manager in admin_managers %}
+                                            <option value="{{ manager.managerId }}"
+                                                {% if rep.manager and rep.manager.managerId == manager.managerId %}selected{% endif %}>
+                                                {{ manager.managerFullname }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <input type="hidden" name="new_administrator" value="{{ currentAdminId }}">                                
+                                </td>
                             </tr>
                         {% endfor %}
+                        {% set currentAdmin = null %}
+                        {% for admin in administrators %}
+                            {% if admin.administratorId == currentAdminId %}
+                                {% set currentAdmin = admin %}
+                            {% endif %}
+                        {% endfor %}
+
                         <tr>
                             <td><input type="text" name="new_title" placeholder="Новое название"></td>
                             <td><input type="number" name="new_size" placeholder="Размер"></td>
                             <td>
-                                <select name="new_administrator">
-                                    <option value="">Администратор</option>
-                                    {% for administrator in administrators %}
-                                        <option value="{{ administrator.administratorId }}">{{ administrator.administratorFullname }}</option>
+                                <input type="hidden" name="new_administrator" value="{{ currentAdminId }}">
+                                {{ currentAdmin ? currentAdmin.administratorFullname : '' }}
+                            </td>
+                            <td>
+                                <select name="new_manager">
+                                    <option value="">Менеджер</option>
+                                    {% for manager in admin_managers %}
+                                        <option value="{{ manager.managerId }}">{{ manager.managerFullname }}</option>
                                     {% endfor %}
                                 </select>
                             </td>

@@ -39,9 +39,9 @@ class Performance{
     #[ORM\JoinColumn(name: "Hall_ID", referencedColumnName: "Hall_ID", nullable: false)]
     private ?Hall $hall = null;
 
-    #[ORM\ManyToOne(targetEntity: Manager::class)]
-    #[ORM\JoinColumn(name: "Manager_ID", referencedColumnName: "Manager_ID", nullable: false)]
-    private ?Manager $manager = null;
+    // #[ORM\ManyToOne(targetEntity: Manager::class)]
+    // #[ORM\JoinColumn(name: "Manager_ID", referencedColumnName: "Manager_ID", nullable: false)]
+    // private ?Manager $manager = null;
 
     #[ORM\OneToMany(targetEntity: ListEntity::class, mappedBy: "performance")]
     private Collection $lists;
@@ -64,8 +64,8 @@ class Performance{
     public function setPerformanceGenre(?string $performanceGenre): self{$this->performanceGenre = $performanceGenre;return $this;}
     public function getHall(): ?Hall{return $this->hall;}
     public function setHall(?Hall $hall): self{$this->hall = $hall;return $this;}
-    public function getManager(): ?Manager{return $this->manager;}
-    public function setManager(?Manager $manager): self{$this->manager = $manager;return $this;}
+    // public function getManager(): ?Manager{return $this->manager;}
+    // public function setManager(?Manager $manager): self{$this->manager = $manager;return $this;}
 
     public function getLists(): Collection{return $this->lists;}
     public function addList(ListEntity $list): self{
