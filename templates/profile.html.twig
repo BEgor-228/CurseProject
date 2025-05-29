@@ -69,6 +69,29 @@
                     <a href="{{ path('app_performances') }}" class="btn">Изменить репертуар</a>
                 </div>
             {% endif %}
+            {% if user.role == 'manager' and commands is not empty %}
+                <h3>Указания от администратора</h3>
+                <table style="width:100%;margin-bottom:20px;">
+                    <thead>
+                        <tr>
+                            <th>Сообщение</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for command in commands %}
+                            <tr>
+                                <td>{{ command.commandContent }}</td>
+                                <td>
+                                    <form method="post" action="{{ path('command_delete', {'id': command.commandId}) }}" style="display:inline;">
+                                        <button type="submit" class="btn" onclick="return confirm('Вы уверены, что выполнили указание?');">Выполнено</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
             {% if user.role == 'admin' %}
                 <div class="admin-actions">
                     <a href="{{ path('app_change_repertoire') }}" class="btn">Добавить репертуар</a>

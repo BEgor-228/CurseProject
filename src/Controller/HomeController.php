@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+// use App\Entity\Manager;
 use App\Service\HomeService;
 use App\Service\PerformanceService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,11 +11,11 @@ use App\Repository\TakePerformanceRepository;
 use App\Repository\RepertoireRepository;
 use App\Repository\HallRepository;
 use App\Repository\TicketRepository;
-use App\Repository\PlaceRepository;
+// use App\Repository\PlaceRepository; //возможно лишнее
 use App\Repository\ManagerRepository;
+use App\Repository\CommandRepository;
 // use App\Repository\ViewerRepository;
 use App\Repository\AdministratorRepository;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -59,8 +60,19 @@ class HomeController extends AbstractController{
     }
 
     #[Route('/profile', name: 'app_profile')]
-    public function profile(SessionInterface $session, TicketRepository $ticketRepository): Response{
+    public function profile(SessionInterface $session, TicketRepository $ticketRepository, CommandRepository $commandRepository, ManagerRepository $managerRepository): Response{
         $result = $this->homeService->getProfileData($session, $ticketRepository);
+        
+        $userData = $session->get('user');
+        $commands = [];
+        if ($userData && $userData['role'] === 'manager') {
+            $manager = $managerRepository->findOneBy(['managerMail' => $userData['email']]);
+            if ($manager) {
+                $commands = $commandRepository->findBy(['manager' => $manager]);
+            }
+        }
+
+        $result['commands'] = $commands;
         if (isset($result['redirect']) && $result['redirect']) {
             $this->addFlash('error', 'Необходимо войти в аккаунт.');
             return $this->redirectToRoute('app_login');
@@ -101,7 +113,6 @@ class HomeController extends AbstractController{
         $userData = $session->get('user');
         $user = null;
         if ($userData && $userData['role'] === 'manager') {
-            // Получаем объект менеджера по email
             $user = $managerRepository->findOneBy(['managerMail' => $userData['email']]);
         }
         $data = $this->performanceService->getPerformancesData(
@@ -194,5 +205,20 @@ class HomeController extends AbstractController{
             'error' => $error,
             'currentAdminId' => $currentAdminId,
         ]);
+    }
+
+    #[Route('/command/delete/{id}', name: 'command_delete', methods: ['POST'])]
+    public function deleteCommand(
+        int $id,
+        CommandRepository $commandRepository,
+        EntityManagerInterface $entityManager,
+        SessionInterface $session
+    ): Response {
+        $command = $commandRepository->find($id);
+        if ($command) {
+            $entityManager->remove($command);
+            $entityManager->flush();
+        }
+        return $this->redirectToRoute('app_profile');
     }
 }
