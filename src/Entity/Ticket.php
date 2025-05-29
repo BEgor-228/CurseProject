@@ -15,9 +15,6 @@ class Ticket{
     #[ORM\Column(name: "Ticket_purchaseDate", type: "date")]
     private ?\DateTimeInterface $ticketPurchaseDate = null;
 
-    // #[ORM\Column(name: "Ticket_hallNumber", type: "integer")]
-    // private ?int $ticketHallNumber = null;
-
     #[ORM\ManyToOne(targetEntity: Viewer::class)]
     #[ORM\JoinColumn(name: "Viewer_ID", referencedColumnName: "Viewer_ID", nullable: false)]
     private ?Viewer $viewer = null;

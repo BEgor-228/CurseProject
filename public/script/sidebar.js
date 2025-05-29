@@ -61,6 +61,4 @@ document.addEventListener('DOMContentLoaded', () => {
             tooltip.style.display = 'none';
         });
     });
-
-    
 });

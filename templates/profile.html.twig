@@ -96,7 +96,77 @@
                 <div class="admin-actions">
                     <a href="{{ path('app_change_repertoire') }}" class="btn">Добавить репертуар</a>
                 </div>
+                <h3>Отправленные указания менеджерам</h3>
+                <table style="width:100%;margin-bottom:20px;">
+                    <thead>
+                        <tr>
+                            <th>Менеджер</th>
+                            <th>Сообщение</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for command in admin_commands %}
+                            <tr>
+                                <td>{{ command.manager.managerFullname }}</td>
+                                <td>{{ command.commandContent }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="2">Нет отправленных указаний.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <h3>Добавить новое указание менеджеру</h3>
+                <form method="post" action="{{ path('command_add') }}">
+                    <textarea name="command_content" placeholder="Текст указания" required style="width:100%;margin-bottom:10px;"></textarea>
+                    <select name="manager_id" required style="width:100%;margin-bottom:10px;">
+                        <option value="">Выберите менеджера</option>
+                        {% for manager in admin_managers %}
+                            <option value="{{ manager.managerId }}">{{ manager.managerFullname }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn">Отправить указание</button>
+                </form>
+                <h2>Спектакли ваших репертуаров</h2>
+                <form method="post" action="{{ path('admin_performances_save') }}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Название спектакля</th>
+                                <th>Описание</th>
+                                <th>Дата</th>
+                                <th>Жанр</th>
+                                <th>Менеджер</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for performance in admin_performances %}
+                                <tr>
+                                    <td>{{ performance.performanceTitle }}</td>
+                                    <td>{{ performance.performanceDescription }}</td>
+                                    <td>{{ performance.performanceData|date('Y-m-d') }}</td>
+                                    <td>{{ performance.performanceGenre }}</td>
+                                    <td>
+                                        <select name="performances[{{ performance.performanceId }}][manager]" required>
+                                            {% for manager in admin_managers %}
+                                                <option value="{{ manager.managerId }}" {% if performance.manager and performance.manager.managerId == manager.managerId %}selected{% endif %}>
+                                                    {{ manager.managerFullname }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5">Нет спектаклей для ваших репертуаров.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn">Сохранить</button>
+                </form>
             {% endif %}
+
             <div class="profile-actions">
                 <a href="{{ path('app_home') }}" class="filter-button">Вернуться</a>
                 <a href="{{ path('app_logout') }}" class="filter-button">Выйти</a>
