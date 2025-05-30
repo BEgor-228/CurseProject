@@ -61,4 +61,29 @@ document.addEventListener('DOMContentLoaded', () => {
             tooltip.style.display = 'none';
         });
     });
+
+    //дял генерации отчетов
+    document.getElementById('least_period').addEventListener('change', function() {
+        document.getElementById('pdf_least_period').value = this.value;
+    });
+    document.getElementById('genre').addEventListener('change', function() {
+        document.getElementById('pdf_genre').value = this.value;
+    });
+    document.getElementById('hall').addEventListener('change', function() {
+        document.getElementById('pdf_hall').value = this.value;
+    });
+    document.getElementById('repertoire_profit').addEventListener('change', function() {
+        document.getElementById('pdf_repertoire_profit').value = this.value;
+    });
+    document.getElementById('repertoire_perf').addEventListener('change', function() {
+        document.getElementById('pdf_repertoire_perf').value = this.value;
+    });
+
+    ['least_period', 'genre', 'hall', 'repertoire_profit', 'repertoire_perf'].forEach(function(field) {
+        document.getElementById(field).addEventListener('change', function() {
+            document.getElementById('pdf_' + field).value = this.value;
+            document.getElementById('excel_' + field).value = this.value;
+            document.getElementById('word_' + field).value = this.value;
+        });
+    });
 });

@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 use App\Service\HomeService;
 use App\Service\PerformanceService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class HomeController extends AbstractController
 {
@@ -105,17 +111,23 @@ class HomeController extends AbstractController
         $genres = array_column($genres, 'performanceGenre'); // Получаем массив жанров
         // Получаем все залы
         $halls = $this->entityManager->getRepository(\App\Entity\Hall::class)->findAll();
-
-        $result['genres'] = $genres;
+        $repertoires = $this->entityManager->getRepository(\App\Entity\Repertoire::class)->findAll();
+        
+        
         $result['halls'] = $halls;
+        $result['genres'] = $genres;
+        $result['commands'] = $commands;
         $result['admin_commands'] = $commands;
         $result['admin_managers'] = $managers;
-        $result['commands'] = $commands;
+        $result['repertoires'] = $repertoires;
         $result['administrators'] = $administrators;
         $result['currentAdminId'] = $currentAdminId;
-        $result['least_period'] = $request->query->get('least_period', 'month');
-        $result['genre'] = $request->query->get('genre', 'all');
         $result['hall'] = $request->query->get('hall', 'all');
+        $result['genre'] = $request->query->get('genre', 'all');
+        $result['least_period'] = $request->query->get('least_period', 'month');
+        $result['repertoire_perf'] = $request->query->get('repertoire_perf', '');
+        $result['repertoire_profit'] = $request->query->get('repertoire_profit', 'all');
+        
 
         if (isset($result['redirect']) && $result['redirect']) {
             $this->addFlash('error', 'Необходимо войти в аккаунт.');

@@ -98,57 +98,75 @@
             {% if user.role == 'admin' %}
                 <div class="admin-stats-section admin-section">
                     <h3>Аналитика спектаклей и продаж</h3>
-                    <form method="get" action="{{ path('app_profile') }}" class="admin-stats-form">
+                    <form method="get" action="{{ path('app_profile') }}" class="admin-stats-form" style="display:flex; flex-direction:column; gap:18px;">
                         <div class="admin-stats-row">
                             <span>10 наименее доходных спектаклей за</span>
-                            <select name="least_period">
+                            <select name="least_period" id="least_period">
                                 <option value="month" {% if least_period == 'month' %}selected{% endif %}>Месяц</option>
                                 <option value="halfyear" {% if least_period == 'halfyear' %}selected{% endif %}>Полгода</option>
                             </select>
-                            <button type="submit" name="action" value="least" class="btn filter-button">Показать</button>
                         </div>
                         <div class="admin-stats-row">
                             <span>Общий доход со спектаклей по жанру</span>
-                            <select name="genre">
+                            <select name="genre" id="genre">
                                 <option value="all" {% if genre == 'all' %}selected{% endif %}>Все жанры</option>
                                 {% for g in genres %}
                                     <option value="{{ g }}" {% if genre == g %}selected{% endif %}>{{ g }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="submit" name="action" value="genre" class="btn filter-button">Показать</button>
                         </div>
                         <div class="admin-stats-row">
                             <span>Продажи билетов для зала</span>
-                            <select name="hall">
+                            <select name="hall" id="hall">
                                 <option value="all" {% if hall == 'all' %}selected{% endif %}>Все залы</option>
                                 {% for h in halls %}
                                     <option value="{{ h.hallId }}" {% if hall == h.hallId %}selected{% endif %}>Зал №{{ h.hallId }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="submit" name="action" value="hall" class="btn filter-button">Показать</button>
+                        </div>
+                        <div class="admin-stats-row">
+                            <span>Общая прибыль репертуаров</span>
+                            <select name="repertoire_profit" id="repertoire_profit">
+                                <option value="all" {% if repertoire_profit == 'all' %}selected{% endif %}>Все репертуары</option>
+                                {% for rep in repertoires %}
+                                    <option value="{{ rep.repertoireTitle }}" {% if repertoire_profit == rep.repertoireTitle %}selected{% endif %}>{{ rep.repertoireTitle }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="admin-stats-row">
+                            <span>Прибыль по спектаклям для репертуара</span>
+                            <select name="repertoire_perf" id="repertoire_perf">
+                                <option value="">Выберите репертуар</option>
+                                {% for rep in repertoires %}
+                                    <option value="{{ rep.repertoireTitle }}" {% if repertoire_perf == rep.repertoireTitle %}selected{% endif %}>{{ rep.repertoireTitle }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </form>
-                    {# Здесь можно выводить результаты аналитики, если они есть #}
-                    {% if least_performances is defined %}
-                        <div class="admin-stats-result">
-                            <strong>10 наименее доходных спектаклей:</strong>
-                            <ul>
-                                {% for perf in least_performances %}
-                                    <li>{{ perf.performanceTitle }} — {{ perf.income }} руб.</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    {% if genre_income is defined %}
-                        <div class="admin-stats-result">
-                            <strong>Общий доход по жанру:</strong> {{ genre_income }} руб.
-                        </div>
-                    {% endif %}
-                    {% if hall_sales is defined %}
-                        <div class="admin-stats-result">
-                            <strong>Продажи билетов для выбранного зала:</strong> {{ hall_sales }} билетов
-                        </div>
-                    {% endif %}
+                    <form method="post" action="{{ path('admin_least_profitable_pdf') }}" style="position:absolute; top:32px; right:32px;">
+                        <input type="hidden" name="least_period" id="pdf_least_period" value="{{ least_period }}">
+                        <input type="hidden" name="genre" id="pdf_genre" value="{{ genre }}">
+                        <input type="hidden" name="hall" id="pdf_hall" value="{{ hall }}">
+                        <input type="hidden" name="repertoire_profit" id="pdf_repertoire_profit" value="{{ repertoire_profit }}">
+                        <input type="hidden" name="repertoire_perf" id="pdf_repertoire_perf" value="{{ repertoire_perf }}">
+                        <button type="submit" class="filter-button">Скачать PDF отчет</button>
+                    </form>
+                    <form method="post" action="{{ path('admin_least_profitable_excel') }}" style="position:absolute; top:80px; right:32px;">
+                        <input type="hidden" name="least_period" id="excel_least_period" value="{{ least_period }}">
+                        <input type="hidden" name="genre" id="excel_genre" value="{{ genre }}">
+                        <input type="hidden" name="hall" id="excel_hall" value="{{ hall }}">
+                        <input type="hidden" name="repertoire_profit" id="excel_repertoire_profit" value="{{ repertoire_profit }}">
+                        <input type="hidden" name="repertoire_perf" id="excel_repertoire_perf" value="{{ repertoire_perf }}">
+                        <button type="submit" class="filter-button">Скачать Excel отчет</button>
+                    </form>
+                    <form method="post" action="{{ path('admin_least_profitable_word') }}" style="position:absolute; top:128px; right:32px;">
+                        <input type="hidden" name="least_period" id="word_least_period" value="{{ least_period }}">
+                        <input type="hidden" name="genre" id="word_genre" value="{{ genre }}">
+                        <input type="hidden" name="hall" id="word_hall" value="{{ hall }}">
+                        <input type="hidden" name="repertoire_profit" id="word_repertoire_profit" value="{{ repertoire_profit }}">
+                        <input type="hidden" name="repertoire_perf" id="word_repertoire_perf" value="{{ repertoire_perf }}">
+                        <button type="submit" class="filter-button">Скачать Word отчет</button>
+                    </form>
                 </div>
             {% endif %}
 
@@ -204,11 +222,11 @@
 
         <div class="footer">
             <p>Контакты: телефон администратора: 89046862432</p>
-            <p>Почта администратора: egorbezrukavnikov@gmail.com</p>
+            <p>Почта администратора: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f396949c8191968981869892859d9a989c85b3949e929a9fdd909c9e">[email&#160;protected]</a></p>
             <p>vk: <a href="https://vk.com/id488943174">https://vk.com/id488943174</a></p>
         </div>
     </div>
 
-    <script src="{{ asset('scripts/sidebar.js') }}"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="{{ asset('script/sidebar.js') }}"></script>
 </body>
 </html>
