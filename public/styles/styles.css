@@ -425,6 +425,14 @@ body {
     font-weight: bold;
 }
 
+.report-buttons form {
+    margin: 0;
+}
+.report-buttons .filter-button {
+    min-width: 80px;
+    padding: 8px 12px;
+}
+
 
 /* Responsive Design */
 @media (min-width: 640px) {

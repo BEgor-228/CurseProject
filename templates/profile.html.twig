@@ -143,30 +143,32 @@
                             </select>
                         </div>
                     </form>
-                    <form method="post" action="{{ path('admin_least_profitable_pdf') }}" style="position:absolute; top:32px; right:32px;">
-                        <input type="hidden" name="least_period" id="pdf_least_period" value="{{ least_period }}">
-                        <input type="hidden" name="genre" id="pdf_genre" value="{{ genre }}">
-                        <input type="hidden" name="hall" id="pdf_hall" value="{{ hall }}">
-                        <input type="hidden" name="repertoire_profit" id="pdf_repertoire_profit" value="{{ repertoire_profit }}">
-                        <input type="hidden" name="repertoire_perf" id="pdf_repertoire_perf" value="{{ repertoire_perf }}">
-                        <button type="submit" class="filter-button">Скачать PDF отчет</button>
-                    </form>
-                    <form method="post" action="{{ path('admin_least_profitable_excel') }}" style="position:absolute; top:80px; right:32px;">
-                        <input type="hidden" name="least_period" id="excel_least_period" value="{{ least_period }}">
-                        <input type="hidden" name="genre" id="excel_genre" value="{{ genre }}">
-                        <input type="hidden" name="hall" id="excel_hall" value="{{ hall }}">
-                        <input type="hidden" name="repertoire_profit" id="excel_repertoire_profit" value="{{ repertoire_profit }}">
-                        <input type="hidden" name="repertoire_perf" id="excel_repertoire_perf" value="{{ repertoire_perf }}">
-                        <button type="submit" class="filter-button">Скачать Excel отчет</button>
-                    </form>
-                    <form method="post" action="{{ path('admin_least_profitable_word') }}" style="position:absolute; top:128px; right:32px;">
-                        <input type="hidden" name="least_period" id="word_least_period" value="{{ least_period }}">
-                        <input type="hidden" name="genre" id="word_genre" value="{{ genre }}">
-                        <input type="hidden" name="hall" id="word_hall" value="{{ hall }}">
-                        <input type="hidden" name="repertoire_profit" id="word_repertoire_profit" value="{{ repertoire_profit }}">
-                        <input type="hidden" name="repertoire_perf" id="word_repertoire_perf" value="{{ repertoire_perf }}">
-                        <button type="submit" class="filter-button">Скачать Word отчет</button>
-                    </form>
+                    <div class="report-buttons" style="display: flex; gap: 12px;">
+                        <form method="post" action="{{ path('admin_least_profitable_pdf') }}">
+                            <input type="hidden" name="least_period" id="pdf_least_period" value="{{ least_period }}">
+                            <input type="hidden" name="genre" id="pdf_genre" value="{{ genre }}">
+                            <input type="hidden" name="hall" id="pdf_hall" value="{{ hall }}">
+                            <input type="hidden" name="repertoire_profit" id="pdf_repertoire_profit" value="{{ repertoire_profit }}">
+                            <input type="hidden" name="repertoire_perf" id="pdf_repertoire_perf" value="{{ repertoire_perf }}">
+                            <button type="submit" class="filter-button">PDF</button>
+                        </form>
+                        <form method="post" action="{{ path('admin_least_profitable_excel') }}">
+                            <input type="hidden" name="least_period" id="excel_least_period" value="{{ least_period }}">
+                            <input type="hidden" name="genre" id="excel_genre" value="{{ genre }}">
+                            <input type="hidden" name="hall" id="excel_hall" value="{{ hall }}">
+                            <input type="hidden" name="repertoire_profit" id="excel_repertoire_profit" value="{{ repertoire_profit }}">
+                            <input type="hidden" name="repertoire_perf" id="excel_repertoire_perf" value="{{ repertoire_perf }}">
+                            <button type="submit" class="filter-button">Excel</button>
+                        </form>
+                        <form method="post" action="{{ path('admin_least_profitable_word') }}">
+                            <input type="hidden" name="least_period" id="word_least_period" value="{{ least_period }}">
+                            <input type="hidden" name="genre" id="word_genre" value="{{ genre }}">
+                            <input type="hidden" name="hall" id="word_hall" value="{{ hall }}">
+                            <input type="hidden" name="repertoire_profit" id="word_repertoire_profit" value="{{ repertoire_profit }}">
+                            <input type="hidden" name="repertoire_perf" id="word_repertoire_perf" value="{{ repertoire_perf }}">
+                            <button type="submit" class="filter-button">Word</button>
+                        </form>
+                    </div>
                 </div>
             {% endif %}
 
@@ -178,7 +180,7 @@
                 </div>
                 <div class="admin-section">
                     <h3>Отправленные указания менеджерам</h3>
-                    <table style="width:100%;margin-bottom:20px;">
+                    <table border="1" style="width:100%; border-collapse: collapse; margin-bottom:20px;">
                         <thead>
                             <tr>
                                 <th>Менеджер</th>
@@ -192,7 +194,9 @@
                                     <td>{{ command.commandContent }}</td>
                                 </tr>
                             {% else %}
-                                <tr><td colspan="2">Нет отправленных указаний.</td></tr>
+                                <tr>
+                                    <td colspan="2">Нет отправленных указаний.</td>
+                                </tr>
                             {% endfor %}
                         </tbody>
                     </table>
