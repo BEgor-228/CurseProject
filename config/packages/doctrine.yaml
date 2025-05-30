@@ -27,6 +27,11 @@ doctrine:
         controller_resolver:
             auto_mapping: false
 
+        # entity_managers:
+        #     default:
+        #         metadata_cache_driver: apc
+        #         query_cache_driver: apc
+
 when@test:
     doctrine:
         dbal:

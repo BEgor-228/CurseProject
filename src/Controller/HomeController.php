@@ -61,6 +61,7 @@ class HomeController extends AbstractController
 
     #[Route('/profile', name: 'app_profile')]
     public function profile(
+        Request $request,
         SessionInterface $session,
         TicketRepository $ticketRepository,
         CommandRepository $commandRepository,
@@ -97,11 +98,24 @@ class HomeController extends AbstractController
             }
         }
 
+        $genres = $performanceRepository->createQueryBuilder('p')
+            ->select('DISTINCT p.performanceGenre')
+            ->getQuery()
+            ->getResult();
+        $genres = array_column($genres, 'performanceGenre'); // Получаем массив жанров
+        // Получаем все залы
+        $halls = $this->entityManager->getRepository(\App\Entity\Hall::class)->findAll();
+
+        $result['genres'] = $genres;
+        $result['halls'] = $halls;
         $result['admin_commands'] = $commands;
         $result['admin_managers'] = $managers;
         $result['commands'] = $commands;
         $result['administrators'] = $administrators;
         $result['currentAdminId'] = $currentAdminId;
+        $result['least_period'] = $request->query->get('least_period', 'month');
+        $result['genre'] = $request->query->get('genre', 'all');
+        $result['hall'] = $request->query->get('hall', 'all');
 
         if (isset($result['redirect']) && $result['redirect']) {
             $this->addFlash('error', 'Необходимо войти в аккаунт.');
@@ -111,6 +125,7 @@ class HomeController extends AbstractController
         return $this->render('profile.html.twig', $result);
     }
 
+
     #[Route('/logout', name: 'app_logout')]
     public function logout(SessionInterface $session): Response
     {
@@ -118,6 +133,7 @@ class HomeController extends AbstractController
         $this->addFlash('success', 'Вы успешно вышли.');
         return $this->redirectToRoute('app_home');
     }
+
 
     //Для редактирования спектаклей
     #[Route('/performances', name: 'app_performances', methods: ['GET', 'POST'])]

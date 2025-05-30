@@ -11,6 +11,13 @@ RUN apt-get update && apt-get install -y \
     git \
     && docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install pdo pdo_pgsql zip gd
+RUN echo "opcache.enable=1\n\
+    opcache.enable_cli=1\n\
+    opcache.memory_consumption=128\n\
+    opcache.interned_strings_buffer=8\n\
+    opcache.max_accelerated_files=10000\n\
+    opcache.revalidate_freq=60\n\
+    opcache.validate_timestamps=0" > /usr/local/etc/php/conf.d/opcache.ini
 
 # Установка Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

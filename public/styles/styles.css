@@ -390,40 +390,6 @@ body {
     background-color: #ffe066 !important;
 }
 
-/* .admin-commands-table {
-    margin: 32px auto !important;
-    border-collapse: collapse;
-    min-width: 500px;
-    background: #23272f;
-    border: 3px solid #facc15;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(250,204,21,0.08);
-}
-.admin-commands-table th, .admin-commands-table td {
-    border: 2px solid #facc15;
-    padding: 14px 22px;
-    text-align: center;
-    color: #fff;
-}
-.admin-commands-table th {
-    background: #facc15;
-    color: #23272f;
-    font-weight: bold;
-}
-.admin-commands-table td form .btn {
-    background-color: #facc15 !important;
-    color: #23272f !important;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.admin-commands-table td form .btn:hover {
-    background-color: #ffe066 !important;
-} */
-
 .admin-commands-container {
     position: fixed;
     top: 50%;
